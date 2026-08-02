@@ -1,0 +1,582 @@
+// ─────────────────────────────────────────────────────────────────────────
+// Passcit — Database Schema
+//
+// This schema was designed for the whole application up front. The phase
+// labels below are historical — the project's actual phase numbering (see
+// README.md's Roadmap) evolved as scope shifted, so these numbers won't
+// all match the current roadmap table exactly. They're kept as-is because
+// they still correctly describe *when each section started being used*,
+// which is the part that matters for reading this file.
+//
+// Sections:
+//   1. Generator / datasource
+//   2. Auth (NextAuth/Auth.js standard models + our extensions)
+//   3. Civics questions & user progress            [used from Phase 2]
+//   4. Flashcards / spaced repetition                (extends section 3)
+//   5. Practice tests                                [used from Phase 4]
+//   6. Voice practice                                [used from Phase 4, Stage 1-2]
+//   7. Streaks & study sessions                      [used from Phase 5]
+//   8. Eligibility calculator                        [used from Phase 8]
+//   9. Admin: announcements, site settings            [partially used from Phase 5]
+//  10. Naturalization Interview Simulation            [used from Phase 7]
+// ─────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ── 2. Auth ─────────────────────────────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String? // null for OAuth-only accounts
+  role          Role      @default(USER)
+  // Admin-controlled account status. Checked at login (see auth.ts) — a
+  // disabled account can't sign in. Doesn't invalidate an already-active
+  // session immediately (sessions are JWT-based/stateless); it takes
+  // effect on the account's next login attempt, which is the standard,
+  // honest tradeoff of stateless sessions rather than a gap.
+  isActive      Boolean   @default(true)
+
+  // Which TestVersion this user is currently studying. Nullable rather
+  // than defaulting to a specific row (Prisma defaults can't reference
+  // another table) — application code falls back to TestVersion.isDefault
+  // whenever this is unset. Switching this never touches any other data:
+  // progress/favorites/flashcard status/practice history all live on rows
+  // scoped to a specific Question, and every Question belongs to exactly
+  // one TestVersion, so nothing needs migrating when a user switches.
+  activeTestVersionId String?
+  activeTestVersion   TestVersion? @relation(fields: [activeTestVersionId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts            Account[]
+  sessions            Session[]
+  passwordResetTokens PasswordResetToken[]
+
+  // Forward-declared relations used starting in later phases:
+  progress          UserQuestionProgress[]
+  practiceTests     PracticeTest[]
+  voiceAttempts     VoicePracticeAttempt[]
+  interviewSimulations InterviewSimulation[]
+  studySessions     StudySession[]
+  streak            StudyStreak?
+  eligibilityChecks EligibilityCalculation[]
+  announcements     Announcement[]           @relation("AnnouncementAuthor")
+
+  @@index([role])
+  @@index([activeTestVersionId])
+  @@index([isActive])
+}
+
+// Standard Auth.js/Prisma-adapter models — do not rename fields, the
+// adapter expects these exact shapes.
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ── 3. Civics questions & user progress ────────────────────────────────
+//
+// Multi-version design: USCIS has published more than one civics test
+// (2008 — 100 questions, currently the default; 2020/2025 — 128
+// questions, now in effect for applicants who filed on or after Oct 20,
+// 2025). Every Question belongs to exactly one TestVersion. Adding a new
+// version later — or updating an existing one — is purely a data change
+// (a new TestVersion row plus its Questions/QuestionAnswers): nothing
+// here needs to change shape. `number` is only unique WITHIN a version
+// (see the composite unique below), since a future version's own #1-128
+// numbering can legitimately collide with the 2008 test's #1-100.
+
+model TestVersion {
+  id             String   @id @default(cuid())
+  slug           String   @unique // e.g. "2008", "2025"
+  name           String // e.g. "2008 Civics Test"
+  year           Int
+  totalQuestions Int // size of this version's full question bank
+  questionsAsked Int // how many the officer asks at interview
+  passThreshold  Int // how many correct are needed to pass
+  isDefault      Boolean  @default(false) // exactly one version should be true
+  isActive       Boolean  @default(true) // available to study in this app
+  description    String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  questions      Question[]
+  practiceTests  PracticeTest[]
+  studySessions  StudySession[]
+  activeForUsers User[]
+  interviewSimulations InterviewSimulation[]
+}
+
+enum QuestionCategory {
+  AMERICAN_GOVERNMENT
+  AMERICAN_HISTORY
+  INTEGRATED_CIVICS
+}
+
+enum StudyStatus {
+  NEW
+  LEARNING
+  KNOWN
+  NEEDS_PRACTICE
+}
+
+model Question {
+  id            String      @id @default(cuid())
+  testVersionId String
+  testVersion   TestVersion @relation(fields: [testVersionId], references: [id], onDelete: Cascade)
+  number        Int // official USCIS numbering WITHIN this test version
+
+  category    QuestionCategory
+  subcategory String // e.g. "Principles of American Democracy"
+
+  question    String  @db.Text
+  explanation String? @db.Text
+
+  // Some questions accept more than one distinct answer (see
+  // QuestionAnswer) and/or require naming more than one of them, e.g.
+  // "Name TWO rights in the Declaration of Independence."
+  requiredAnswerCount Int @default(1)
+
+  // Applicants 65+ with 20+ years as a permanent resident only need to
+  // study the ~20 questions USCIS marks with an asterisk.
+  isSpecial65_20 Boolean @default(false)
+
+  // Answers that change over time (current officials) vs. answers that
+  // depend on the applicant's own state/district — these need different
+  // UI treatment, so they're tracked separately rather than lumped into
+  // one flag.
+  isDynamicAnswer Boolean @default(false)
+  dynamicNote     String? @db.Text
+  variesByLocation Boolean @default(false)
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  answers       QuestionAnswer[]
+  tags          QuestionTag[]
+  progress      UserQuestionProgress[]
+  testAnswers   PracticeTestAnswer[]
+  voiceAttempts VoicePracticeAttempt[]
+  interviewAnswers InterviewCivicsAnswer[]
+
+  @@unique([testVersionId, number])
+  @@index([category])
+  @@index([testVersionId, isActive])
+}
+
+// One row per acceptable answer. Modeling this as a related table
+// (rather than a JSON string array) keeps individual answers queryable
+// and indexable — e.g. for search — as the question bank grows.
+model QuestionAnswer {
+  id         String   @id @default(cuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([questionId])
+}
+
+// Freeform, cross-cutting labels (e.g. "Constitution", "Elections") —
+// distinct from `category`, which is USCIS's own fixed 3-part taxonomy.
+model Tag {
+  id        String        @id @default(cuid())
+  name      String        @unique
+  slug      String        @unique
+  createdAt DateTime      @default(now())
+  questions QuestionTag[]
+}
+
+model QuestionTag {
+  questionId String
+  tagId      String
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([questionId, tagId])
+  @@index([tagId])
+}
+
+model UserQuestionProgress {
+  id     String @id @default(cuid())
+  userId String
+  questionId String
+
+  status     StudyStatus @default(NEW)
+  isFavorite Boolean     @default(false)
+
+  timesCorrect   Int @default(0)
+  timesIncorrect Int @default(0)
+
+  // Spaced-repetition scheduling (SM-2 style)
+  easeFactor   Float     @default(2.5)
+  intervalDays Int       @default(0)
+  repetitions  Int       @default(0)
+  lastReviewedAt DateTime?
+  nextReviewAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@index([userId, nextReviewAt])
+  @@index([userId, status])
+}
+
+// ── 5. Practice tests ───────────────────────────────────────────────────
+
+enum TestMode {
+  RANDOM_10
+  FULL_100
+  MISSED_ONLY
+  CATEGORY
+  MOCK_INTERVIEW
+}
+
+model PracticeTest {
+  id             String    @id @default(cuid())
+  userId         String
+  testVersionId  String
+  mode           TestMode
+  category       QuestionCategory?
+  score          Int?
+  totalQuestions Int
+  passed         Boolean?
+  // Mock Interview mode replicates the real N-400 rule: the officer
+  // stops asking as soon as the applicant passes or can no longer
+  // mathematically pass, rather than always asking a fixed number.
+  stoppedEarly Boolean   @default(false)
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
+
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testVersion TestVersion          @relation(fields: [testVersionId], references: [id], onDelete: Restrict)
+  answers     PracticeTestAnswer[]
+
+  @@index([userId])
+  @@index([testVersionId])
+}
+
+model PracticeTestAnswer {
+  id           String   @id @default(cuid())
+  testId       String
+  questionId   String
+  userAnswer   String   @db.Text
+  isCorrect    Boolean
+  timeSpentSec Int?
+  answeredAt   DateTime @default(now())
+
+  test     PracticeTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+  question Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([testId])
+}
+
+// ── 6. Voice practice ────────────────────────────────────────────────────
+
+enum VoiceEvaluationResult {
+  CORRECT
+  ALMOST_CORRECT
+  INCORRECT
+}
+
+model VoicePracticeAttempt {
+  id         String                 @id @default(cuid())
+  userId     String
+  questionId String
+  transcript String                 @db.Text
+  result     VoiceEvaluationResult
+  feedback   String?                @db.Text
+  createdAt  DateTime               @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ── 7. Streaks & study sessions ─────────────────────────────────────────
+
+model StudyStreak {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  currentStreak    Int       @default(0)
+  longestStreak    Int       @default(0)
+  lastStudyDate    DateTime?
+  freezesAvailable Int       @default(0)
+  updatedAt        DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model StudySession {
+  id                String   @id @default(cuid())
+  userId            String
+  testVersionId     String
+  date              DateTime @db.Date
+  minutesStudied    Int      @default(0)
+  questionsReviewed Int      @default(0)
+  createdAt         DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testVersion TestVersion @relation(fields: [testVersionId], references: [id], onDelete: Restrict)
+
+  // A user can have separate activity logged per version per day (rare,
+  // but architecturally correct if someone studies both in one sitting).
+  @@unique([userId, date, testVersionId])
+}
+
+// ── 8. Eligibility calculator ───────────────────────────────────────────
+
+enum EligibilityBasis {
+  GENERAL // 5-year permanent residence
+  MARRIED_TO_CITIZEN // 3-year, married to & living with a U.S. citizen
+  MILITARY // INA 328/329 — deliberately not calculated by this tool; see EligibilityCalculation model comment
+}
+
+enum MilitaryServiceType {
+  MANDATORY
+  VOLUNTARY
+}
+
+model EligibilityCalculation {
+  id     String @id @default(cuid())
+  userId String?
+
+  basis              EligibilityBasis @default(GENERAL)
+  greenCardDate      DateTime
+  state              String
+  birthDate          DateTime?
+
+  marriedToUSCitizen Boolean @default(false)
+  spouseIsUSCitizen  Boolean @default(false)
+
+  // Military service (basis = MILITARY). All nullable — only collected
+  // and only meaningful when that path is chosen. Deliberately, this
+  // tool never calculates an eligibility date through INA 328/329: real
+  // eligibility there turns on discharge characterization, designated
+  // periods of hostility, and current-vs-former service status, all of
+  // which USCIS determines case by case. Selecting MILITARY routes
+  // straight to a "gather these documents, consult USCIS or an
+  // immigration attorney" result instead of a computed date.
+  militaryCountryServed    String?
+  militaryServiceType      MilitaryServiceType?
+  militaryServiceStart     DateTime?
+  militaryServiceEnd       DateTime?
+  militaryCurrentlyServing Boolean?
+  militaryUSArmedForces    Boolean?
+
+  travelHistory      Json? // array of { departDate, returnDate, days }
+  totalDaysOutsideUS Int   @default(0)
+  longestTripDays    Int   @default(0)
+
+  selectiveServiceRequired   Boolean?
+  selectiveServiceRegistered Boolean?
+
+  eligibleFilingDate      DateTime
+  requiredResidencyYears  Int
+  physicalPresenceDaysReq Int
+  continuousResidenceOk   Boolean  @default(true)
+
+  warnings Json? // string[] of flagged/missing requirements
+
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ── 9. Admin ─────────────────────────────────────────────────────────────
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  body      String   @db.Text
+  isActive  Boolean  @default(true)
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author User @relation("AnnouncementAuthor", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@index([isActive])
+}
+
+// Site-wide configuration, edited from the admin Settings page. A
+// singleton by convention (application code always reads/writes the row
+// with id "singleton"), not a database-level constraint — Prisma/MySQL
+// have no clean native way to enforce "at most one row," and a
+// well-known fixed id is a common, simple way to get the same effect.
+//
+// "Default Test Version" is deliberately NOT duplicated here — it's
+// TestVersion.isDefault, which already exists and is the single source
+// of truth app-wide. The Settings page reads/writes that field directly
+// rather than mirroring it into a second place it could drift out of
+// sync with.
+//
+// "Voice Defaults" (voiceDefaultRate) is stored and editable here, but
+// deliberately NOT wired into src/hooks/useSpeech.ts — connecting it
+// would mean modifying a Voice Playback file, which this phase leaves
+// untouched. Wiring it up is a natural, contained follow-up.
+model SiteSettings {
+  id               String   @id @default(cuid())
+  siteName         String   @default("Passcit")
+  logoUrl          String?
+  voiceDefaultRate Float    @default(1)
+  maintenanceMode  Boolean  @default(false)
+  updatedAt        DateTime @updatedAt
+  updatedBy        String?
+}
+
+// ── 10. Naturalization Interview Simulation ────────────────────────────
+//
+// A full, guided walkthrough of a real N-400 interview: identity/speaking
+// practice, then the Reading and Writing portions of the English test,
+// then the Civics test — each section independently pass/failed, matching
+// how USCIS actually retests only the failed portion rather than the
+// whole interview. See PHASE-7-INTERVIEW-SIMULATION.md for the design
+// rationale, especially why identity-question answers are never stored.
+
+enum InterviewSectionResult {
+  PASSED
+  FAILED
+  // The interview was abandoned (browser closed, navigated away) before
+  // this section was reached. Distinct from FAILED so a partial attempt
+  // in history doesn't look like a failed test the applicant actually sat.
+  NOT_REACHED
+}
+
+model InterviewSimulation {
+  id            String @id @default(cuid())
+  userId        String
+  testVersionId String
+
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  durationSec Int? // set once, at completion
+
+  // Identity Questions (speaking practice) — deliberately has no score
+  // and no stored answer text. See the model-level note above.
+  identityQuestionsCompleted Boolean @default(false)
+
+  readingResult InterviewSectionResult @default(NOT_REACHED)
+  // Each entry: { sentence: string, transcript: string, isCorrect: boolean }.
+  // Bounded to at most 3 (USCIS shows at most 3 reading sentences), so a
+  // JSON column is simpler than a relational table here — unlike civics,
+  // there's no cross-interview aggregate query (like "most missed
+  // sentence") that would need this to be queryable on its own.
+  readingAttempts Json?
+
+  writingResult InterviewSectionResult @default(NOT_REACHED)
+  // Each entry: { sentence: string, typedAnswer: string, isCorrect: boolean }.
+  writingAttempts Json?
+
+  civicsResult         InterviewSectionResult @default(NOT_REACHED)
+  civicsCorrectCount   Int                    @default(0)
+  civicsIncorrectCount Int                    @default(0)
+
+  // Null while in progress. True only if every section that was actually
+  // reached passed — Reading/Writing/Civics all graded independently, so
+  // this is a derived summary computed once at completion, not a fourth
+  // independent judgment call.
+  passed Boolean?
+
+  user          User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testVersion   TestVersion             @relation(fields: [testVersionId], references: [id], onDelete: Restrict)
+  civicsAnswers InterviewCivicsAnswer[]
+
+  @@index([userId])
+  @@index([testVersionId])
+  @@index([userId, completedAt])
+}
+
+// One row per civics question actually asked during an interview —
+// mirrors PracticeTestAnswer's shape deliberately, since it serves the
+// same two purposes: per-interview "here's what you said" review, and
+// cross-interview admin analytics (most-missed questions, weakest
+// categories) that a JSON blob couldn't answer efficiently.
+model InterviewCivicsAnswer {
+  id          String   @id @default(cuid())
+  interviewId String
+  questionId  String
+  isCorrect   Boolean
+  answeredAt  DateTime @default(now())
+
+  // Transcribed speech (or typed fallback) — kept for the review screen,
+  // not scored against anything beyond the original evaluateAnswer() call
+  // made when the answer was given.
+  spokenAnswer String @db.Text
+
+  interview InterviewSimulation @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  question  Question            @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([interviewId])
+  @@index([questionId])
+}

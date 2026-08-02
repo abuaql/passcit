@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+/* Tailwind v4 has no `darkMode` config option anymore — this custom variant
+   is what makes `dark:` utilities respond to a `.dark` class on <html>,
+   matching next-themes' `attribute="class"` strategy. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* ── Passcit design tokens — Light ──────────────────────────
+     Primary "Sprout Green": growth/progress. Secondary "Liberty Blue":
+     trust/civics. Accent "Torch Gold": streaks & achievements.
+
+     primary/destructive/warning were darkened from their original
+     hue-family shades during the Phase 6 accessibility audit — the
+     original values failed WCAG AA (4.5:1) as button-fill-with-white-text
+     and as plain text color, verified with the real relative-luminance
+     formula rather than eyeballed. Dark mode's equivalents already
+     passed every check and are untouched. */
+  --background: #faf9f6;
+  --foreground: #1a1d23;
+
+  --card: #ffffff;
+  --card-foreground: #1a1d23;
+
+  --primary: #2d8142;
+  --primary-dark: #226232;
+  --primary-foreground: #ffffff;
+
+  --secondary: #2c5fba;
+  --secondary-dark: #1e4589;
+  --secondary-foreground: #ffffff;
+
+  --accent: #f5a623;
+  --accent-foreground: #1a1d23;
+
+  --destructive: #c93338;
+  --destructive-dark: #a82b2f;
+  --destructive-foreground: #ffffff;
+
+  --success: #2d8142;
+  --warning: #895806;
+
+  --muted: #f0eee6;
+  --muted-foreground: #6b7280;
+  --border: #e8e4da;
+
+  --radius: 1rem;
+}
+
+.dark {
+  --background: #14181f;
+  --foreground: #edeff2;
+
+  --card: #1c222c;
+  --card-foreground: #edeff2;
+
+  --primary: #4ade80;
+  --primary-dark: #22a559;
+  --primary-foreground: #0b1210;
+
+  --secondary: #5b8def;
+  --secondary-dark: #3e6bc4;
+  --secondary-foreground: #0b1210;
+
+  --accent: #fbbf42;
+  --accent-foreground: #1a1d23;
+
+  --destructive: #f2646b;
+  --destructive-dark: #c93338;
+  --destructive-foreground: #1a1d23;
+
+  --success: #4ade80;
+  --warning: #fbbf42;
+
+  --muted: #232a35;
+  --muted-foreground: #9aa3b2;
+  --border: #2a313d;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-dark: var(--secondary-dark);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-dark: var(--destructive-dark);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+
+  --radius-lg: var(--radius);
+
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .font-heading {
+    font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Standalone-mode safe area: keeps content clear of the home indicator
+   on notched iOS devices when installed. env() resolves to 0 on browsers
+   without a safe-area concept, so this is a no-op everywhere else. */
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}

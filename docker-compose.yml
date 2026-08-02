@@ -1,0 +1,45 @@
+# Local MySQL for development only. Not used in production —
+# on Hostinger you'll point DATABASE_URL at their managed MySQL instead.
+#
+# Usage:
+#   docker compose up -d
+#   (then DATABASE_URL in .env matches the credentials below out of the box)
+#
+# The mysql-init script grants the app user CREATE/DROP privileges beyond
+# just its own database — Prisma's `migrate dev` needs that to create its
+# temporary "shadow database." It only runs on a fresh volume; if you had
+# this container running before that script existed, see the README's
+# Troubleshooting section for the one-time fix command.
+#
+# `name` is pinned explicitly rather than left to default to the project
+# folder's name. Docker Compose otherwise derives container/volume names
+# from the folder it's run in — without this pin, renaming or moving the
+# project folder (e.g. during the Passcit rebrand) would make Compose
+# treat your existing database as a different project and spin up an
+# empty one instead of reusing it. The database name/user/password below
+# are unrelated to the app's product name (Passcit) and are left as-is on
+# purpose, so any already-configured local setup keeps working unchanged.
+name: civicsprep
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: civicsprep
+      MYSQL_USER: civicsprep
+      MYSQL_PASSWORD: civicsprep
+      MYSQL_ROOT_PASSWORD: civicsprep_root
+    ports:
+      - "3306:3306"
+    volumes:
+      - civicsprep_mysql_data:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pcivicsprep_root"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  civicsprep_mysql_data:
