@@ -9,7 +9,7 @@ import { isUniqueConstraintError } from "@/lib/utils";
 const questionInputSchema = z.object({
   testVersionId: z.string().min(1),
   number: z.number().int().positive(),
-  category: z.enum(["AMERICAN_GOVERNMENT", "AMERICAN_HISTORY", "INTEGRATED_CIVICS"]),
+  category: z.enum(["AMERICAN_GOVERNMENT", "AMERICAN_HISTORY", "INTEGRATED_CIVICS", "SYMBOLS_AND_HOLIDAYS"]),
   subcategory: z.string().min(1),
   question: z.string().min(1),
   explanation: z.string().nullable().optional(),

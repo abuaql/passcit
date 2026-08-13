@@ -9,7 +9,7 @@ import type { QuestionCategory } from "@/generated/prisma/client";
 
 const bodySchema = z.object({
   mode: z.enum(["RANDOM_10", "CATEGORY", "MISSED_ONLY", "MOCK_INTERVIEW"]),
-  category: z.enum(["AMERICAN_GOVERNMENT", "AMERICAN_HISTORY", "INTEGRATED_CIVICS"]).optional(),
+  category: z.enum(["AMERICAN_GOVERNMENT", "AMERICAN_HISTORY", "INTEGRATED_CIVICS", "SYMBOLS_AND_HOLIDAYS"]).optional(),
 });
 
 // Practice Mode sessions stay a fixed, practice-friendly size regardless

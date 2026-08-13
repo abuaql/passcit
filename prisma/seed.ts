@@ -1,25 +1,70 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
+import type { DynamicOfficialKey } from "../src/generated/prisma/client";
 import { createDbAdapter } from "../src/lib/db-adapter";
+import { prisma as sharedPrisma } from "../src/lib/prisma";
+import { seedDynamicOfficials, resolveAnswers, type DynamicOfficialConfig } from "../src/lib/dynamic-officials";
 import questions2008 from "./data/questions-2008.json";
 import questions2020 from "./data/questions-2020.json";
+import questions2025 from "./data/questions-2025.json";
 
 const prisma = new PrismaClient({ adapter: createDbAdapter() });
 
 interface SeedQuestion {
   number: number;
-  category: "AMERICAN_GOVERNMENT" | "AMERICAN_HISTORY" | "INTEGRATED_CIVICS";
+  category: "AMERICAN_GOVERNMENT" | "AMERICAN_HISTORY" | "INTEGRATED_CIVICS" | "SYMBOLS_AND_HOLIDAYS";
   subcategory: string;
   question: string;
   answers: string[];
   explanation?: string;
   isSpecial65_20?: boolean;
   isDynamicAnswer?: boolean;
+  // Set only for questions whose answer should be sourced from the
+  // DynamicOfficial table at seed time (see seedDynamicOfficials/
+  // resolveAnswers below) instead of being hardcoded in this array.
+  dynamicOfficialKey?: DynamicOfficialKey;
   dynamicNote?: string;
   variesByLocation?: boolean;
   requiredAnswerCount?: number;
 }
+
+// Current officeholders for the 4 dynamic-answer civics questions.
+// Independently verified against uscis.gov/citizenship/testupdates (the
+// exact source the official USCIS test document itself cites) plus
+// corroborating sources — not copied from any version's own seed JSON.
+//
+// SCOPE (Phase 9 content addition): only the 2025 TestVersion's
+// questions reference these via dynamicOfficialKey. 2008 and 2020 keep
+// their existing hardcoded-per-version answers, entirely untouched —
+// centralizing them onto this table too is a deliberate future
+// migration, not part of this change.
+const DYNAMIC_OFFICIALS: DynamicOfficialConfig[] = [
+  {
+    key: "PRESIDENT",
+    currentValue: "Donald J. Trump",
+    sourceUrl: "https://www.uscis.gov/citizenship/testupdates",
+    lastVerifiedAt: new Date("2026-08-12T00:00:00.000Z"),
+  },
+  {
+    key: "VICE_PRESIDENT",
+    currentValue: "JD Vance",
+    sourceUrl: "https://www.uscis.gov/citizenship/testupdates",
+    lastVerifiedAt: new Date("2026-08-12T00:00:00.000Z"),
+  },
+  {
+    key: "SPEAKER_OF_THE_HOUSE",
+    currentValue: "Mike Johnson",
+    sourceUrl: "https://www.uscis.gov/citizenship/testupdates",
+    lastVerifiedAt: new Date("2026-08-12T00:00:00.000Z"),
+  },
+  {
+    key: "CHIEF_JUSTICE",
+    currentValue: "John Roberts",
+    sourceUrl: "https://www.uscis.gov/citizenship/testupdates",
+    lastVerifiedAt: new Date("2026-08-12T00:00:00.000Z"),
+  },
+];
 
 interface TestVersionConfig {
   slug: string;
@@ -93,6 +138,22 @@ const VERSIONS: TestVersionConfig[] = [
       "Native Americans": [74, 117],
       "Citizen Duties": [63, 64, 66, 67, 68, 69, 70, 71, 72],
     },
+  },
+  {
+    slug: "2025",
+    name: "2025 Civics Test",
+    year: 2025,
+    totalQuestions: 128,
+    questionsAsked: 20,
+    passThreshold: 12,
+    isDefault: false,
+    description:
+      "The official USCIS 2025 civics test (form M-1778 (09/25)), effective for applicants who file Form N-400 on or after October 20, 2025. Transcribed directly from the USCIS source document — see prisma/data/sources/uscis-2025-civics-test-m1778.pdf.",
+    questions: questions2025 as SeedQuestion[],
+    // Deliberately empty — thematic tag curation for this version is
+    // deferred, same as Unit/Lesson roadmap content (not part of this
+    // content-addition change).
+    tagAssignments: {},
   },
 ];
 
@@ -174,6 +235,7 @@ async function seedTestVersion(config: TestVersionConfig) {
         requiredAnswerCount: q.requiredAnswerCount ?? 1,
         isSpecial65_20: q.isSpecial65_20 ?? false,
         isDynamicAnswer: q.isDynamicAnswer ?? false,
+        dynamicOfficialKey: q.dynamicOfficialKey ?? null,
         dynamicNote: q.dynamicNote ?? null,
         variesByLocation: q.variesByLocation ?? false,
         isActive: true,
@@ -188,6 +250,7 @@ async function seedTestVersion(config: TestVersionConfig) {
         requiredAnswerCount: q.requiredAnswerCount ?? 1,
         isSpecial65_20: q.isSpecial65_20 ?? false,
         isDynamicAnswer: q.isDynamicAnswer ?? false,
+        dynamicOfficialKey: q.dynamicOfficialKey ?? null,
         dynamicNote: q.dynamicNote ?? null,
         variesByLocation: q.variesByLocation ?? false,
       },
@@ -197,10 +260,11 @@ async function seedTestVersion(config: TestVersionConfig) {
 
     // Replace this question's answers wholesale — simplest way to keep
     // the seed idempotent without needing a natural unique key per answer.
+    const answers = await resolveAnswers(q.answers, q.dynamicOfficialKey);
     await prisma.questionAnswer.deleteMany({ where: { questionId: question.id } });
-    if (q.answers.length > 0) {
+    if (answers.length > 0) {
       await prisma.questionAnswer.createMany({
-        data: q.answers.map((text, i) => ({ questionId: question.id, text, sortOrder: i })),
+        data: answers.map((text, i) => ({ questionId: question.id, text, sortOrder: i })),
       });
     }
   }
@@ -232,7 +296,21 @@ async function seedTestVersion(config: TestVersionConfig) {
 
 async function main() {
   await seedAdmin();
-  for (const version of VERSIONS) {
+  await seedDynamicOfficials(DYNAMIC_OFFICIALS);
+  console.log(`✔ Seeded ${DYNAMIC_OFFICIALS.length} dynamic officials.`);
+
+  // Optional slug filter (e.g. `tsx prisma/seed.ts 2025`) so a single
+  // TestVersion can be (re)seeded without touching any other version's
+  // rows at all — no upsert/delete/create call is made against them.
+  // Omitted, this seeds every version, same as before.
+  const filterSlug = process.argv[2];
+  const versionsToSeed = filterSlug ? VERSIONS.filter((v) => v.slug === filterSlug) : VERSIONS;
+
+  if (filterSlug && versionsToSeed.length === 0) {
+    throw new Error(`No TestVersion config found for slug "${filterSlug}".`);
+  }
+
+  for (const version of versionsToSeed) {
     await seedTestVersion(version);
   }
   console.log("✔ Seed complete.");
@@ -244,5 +322,9 @@ main()
     process.exit(1);
   })
   .finally(async () => {
+    // dynamic-officials.ts (src/lib) uses the shared prisma singleton,
+    // separate from this script's own client — both need closing for
+    // the process to exit cleanly.
     await prisma.$disconnect();
+    await sharedPrisma.$disconnect();
   });

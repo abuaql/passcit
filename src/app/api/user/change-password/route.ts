@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { requireUser } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 import { changePasswordSchema } from "@/lib/validations/auth";
+import { revokeAllRefreshTokensForUser } from "@/lib/native-auth/refresh-token";
 import { logger } from "@/lib/logger";
 
 export async function POST(req: Request) {
@@ -34,6 +35,11 @@ export async function POST(req: Request) {
 
     const passwordHash = await bcrypt.hash(parsed.data.newPassword, 12);
     await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+    // A changed password should sign the account out of every other
+    // device — the native app has no cookie session to invalidate, so its
+    // equivalent is revoking every refresh token that could otherwise
+    // keep minting new access tokens.
+    await revokeAllRefreshTokensForUser(user.id);
 
     return NextResponse.json({ message: "Password updated." });
   } catch (error) {

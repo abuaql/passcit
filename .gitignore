@@ -39,3 +39,8 @@ next-env.d.ts
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# Xcode
+**/xcuserdata/
+**/DerivedData/
+*.xcuserstate

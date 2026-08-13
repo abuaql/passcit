@@ -68,6 +68,7 @@ model User {
   accounts            Account[]
   sessions            Session[]
   passwordResetTokens PasswordResetToken[]
+  nativeRefreshTokens NativeRefreshToken[]
 
   // Forward-declared relations used starting in later phases:
   progress          UserQuestionProgress[]
@@ -78,6 +79,11 @@ model User {
   streak            StudyStreak?
   eligibilityChecks EligibilityCalculation[]
   announcements     Announcement[]           @relation("AnnouncementAuthor")
+  unitProgress      UnitProgress[]
+  lessonProgress    LessonProgress[]
+  unitExamAttempts  UnitExamAttempt[]
+  xp                UserXP?
+  xpEvents          XPEvent[]
 
   @@index([role])
   @@index([activeTestVersionId])
@@ -134,6 +140,29 @@ model PasswordResetToken {
   @@index([userId])
 }
 
+// Bearer-token session for the native iOS app, parallel to (and fully
+// independent of) the Session/VerificationToken pair Auth.js uses for the
+// web app's cookie sessions — see src/lib/native-auth. Only the refresh
+// token is persisted here; the short-lived access token is a stateless,
+// self-verifying JWT and is never written to the database. `tokenHash` is
+// a one-way SHA-256 hash — the raw refresh token is only ever known to
+// the client and is never stored, matching how passwordHash never stores
+// a plaintext password.
+model NativeRefreshToken {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String    @unique
+  deviceInfo String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
 // ── 3. Civics questions & user progress ────────────────────────────────
 //
 // Multi-version design: USCIS has published more than one civics test
@@ -165,12 +194,41 @@ model TestVersion {
   studySessions  StudySession[]
   activeForUsers User[]
   interviewSimulations InterviewSimulation[]
+  units          Unit[]
 }
 
 enum QuestionCategory {
   AMERICAN_GOVERNMENT
   AMERICAN_HISTORY
   INTEGRATED_CIVICS
+  // The official USCIS 2025 (128-question) test's third top-level
+  // section is literally titled "Symbols and Holidays", not "Integrated
+  // Civics" — kept as its own value rather than folded into
+  // INTEGRATED_CIVICS so the category matches the source document
+  // exactly. Used only by the 2025 TestVersion's questions 119-128.
+  SYMBOLS_AND_HOLIDAYS
+}
+
+// Some civics questions (current President, VP, Speaker of the House,
+// Chief Justice) have an answer that changes over time rather than
+// being fixed content. Modeled as its own small lookup table, keyed by
+// office, so the current value has one place to update and cite a
+// source/verification date — see DynamicOfficial.
+enum DynamicOfficialKey {
+  PRESIDENT
+  VICE_PRESIDENT
+  SPEAKER_OF_THE_HOUSE
+  CHIEF_JUSTICE
+}
+
+model DynamicOfficial {
+  id             String             @id @default(cuid())
+  key            DynamicOfficialKey @unique
+  currentValue   String // e.g. "Donald J. Trump"
+  sourceUrl      String?
+  lastVerifiedAt DateTime
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 }
 
 enum StudyStatus {
@@ -205,9 +263,13 @@ model Question {
   // depend on the applicant's own state/district — these need different
   // UI treatment, so they're tracked separately rather than lumped into
   // one flag.
-  isDynamicAnswer Boolean @default(false)
-  dynamicNote     String? @db.Text
-  variesByLocation Boolean @default(false)
+  isDynamicAnswer    Boolean             @default(false)
+  dynamicNote        String?             @db.Text
+  // Set only when isDynamicAnswer is true AND this question's answer
+  // should be sourced from the DynamicOfficial table at seed time,
+  // rather than hardcoded directly in this version's seed JSON.
+  dynamicOfficialKey DynamicOfficialKey?
+  variesByLocation   Boolean             @default(false)
 
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -219,6 +281,8 @@ model Question {
   testAnswers   PracticeTestAnswer[]
   voiceAttempts VoicePracticeAttempt[]
   interviewAnswers InterviewCivicsAnswer[]
+  lessonQuestions   LessonQuestion[]
+  unitExamQuestions UnitExamQuestion[]
 
   @@unique([testVersionId, number])
   @@index([category])
@@ -579,4 +643,217 @@ model InterviewCivicsAnswer {
 
   @@index([interviewId])
   @@index([questionId])
+}
+
+// ── 11. Learning Roadmap ────────────────────────────────────────────────
+//
+// A structured Unit -> Lesson -> Unit Exam progression, layered ON TOP of
+// the existing per-question mastery system (UserQuestionProgress/SM-2) —
+// not a replacement for it. LessonQuestion/UnitExamQuestion are pure join
+// tables against the existing Question bank; no question content is ever
+// duplicated or fabricated here (see prisma/seed-roadmap.ts).
+//
+// Unlock state (LOCKED/AVAILABLE/IN_PROGRESS/COMPLETED) is computed at
+// read time by src/lib/roadmap.ts from whatever UnitProgress/
+// LessonProgress rows happen to exist — a missing row simply means "not
+// yet touched," which the computation treats as its correct default.
+// Read (GET) endpoints never create these rows; only the write endpoints
+// (lesson complete, exam start/complete) do.
+
+model Unit {
+  id            String      @id @default(cuid())
+  testVersionId String
+  testVersion   TestVersion @relation(fields: [testVersionId], references: [id], onDelete: Cascade)
+  slug          String
+  title         String
+  description   String?     @db.Text
+  order         Int
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  lessons      Lesson[]
+  exam         UnitExam?
+  unitProgress UnitProgress[]
+
+  @@unique([testVersionId, order])
+  @@unique([testVersionId, slug])
+  @@index([testVersionId, isActive])
+}
+
+model Lesson {
+  id        String   @id @default(cuid())
+  unitId    String
+  unit      Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  slug      String
+  title     String
+  summary   String?  @db.Text
+  order     Int
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lessonQuestions LessonQuestion[]
+  lessonProgress  LessonProgress[]
+
+  @@unique([unitId, order])
+  @@unique([unitId, slug])
+  @@index([unitId, isActive])
+}
+
+// Pure join table — assigns an EXISTING Question to a Lesson, ordered.
+// A Question can appear in more than one lesson; nothing about Question
+// is ever duplicated or modified by this table.
+model LessonQuestion {
+  id         String   @id @default(cuid())
+  lessonId   String
+  questionId String
+  order      Int
+
+  lesson   Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([lessonId, questionId])
+  @@unique([lessonId, order])
+  @@index([questionId])
+}
+
+model UnitExam {
+  id            String   @id @default(cuid())
+  unitId        String   @unique
+  unit          Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  questionCount Int
+  passThreshold Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  examQuestions UnitExamQuestion[]
+  attempts      UnitExamAttempt[]
+}
+
+// Optional curated question pool for an exam. If a UnitExam has none, exam
+// question selection falls back to drawing from the unit's own
+// LessonQuestion pool instead (see src/lib/roadmap-progress.ts).
+model UnitExamQuestion {
+  id         String   @id @default(cuid())
+  unitExamId String
+  questionId String
+
+  unitExam UnitExam @relation(fields: [unitExamId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([unitExamId, questionId])
+  @@index([questionId])
+}
+
+enum UnitExamAttemptResult {
+  IN_PROGRESS
+  PASSED
+  FAILED
+}
+
+model UnitExamAttempt {
+  id             String                @id @default(cuid())
+  unitExamId     String
+  userId         String
+  score          Int?
+  totalQuestions Int
+  result         UnitExamAttemptResult @default(IN_PROGRESS)
+  // The exact, ordered set of Question ids drawn for this specific
+  // attempt, fixed at start time. Grading at completion validates the
+  // submission against exactly this set — never against whatever the
+  // question pool looks like by the time the attempt is submitted, and
+  // never allowing a duplicate/substituted question id to sneak in.
+  // Bounded (questionCount is small) and never queried across attempts,
+  // so a JSON column is simpler here than a relational table — the same
+  // reasoning already used for InterviewSimulation.readingAttempts.
+  questionIds Json
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  unitExam UnitExam @relation(fields: [unitExamId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([unitExamId])
+}
+
+enum ProgressStatus {
+  LOCKED
+  AVAILABLE
+  IN_PROGRESS
+  COMPLETED
+}
+
+model UnitProgress {
+  id          String         @id @default(cuid())
+  userId      String
+  unitId      String
+  // COMPLETED/examPassed are the only durable facts this row exists to
+  // record — LOCKED/AVAILABLE/IN_PROGRESS are always re-derived live at
+  // read time (see src/lib/roadmap.ts), never trusted as stored state,
+  // so `status` here only ever meaningfully holds COMPLETED in practice.
+  status      ProgressStatus @default(LOCKED)
+  examPassed  Boolean        @default(false)
+  completedAt DateTime?
+  updatedAt   DateTime       @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  unit Unit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, unitId])
+  @@index([userId, status])
+}
+
+model LessonProgress {
+  id          String         @id @default(cuid())
+  userId      String
+  lessonId    String
+  status      ProgressStatus @default(LOCKED)
+  completedAt DateTime?
+  updatedAt   DateTime       @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId, status])
+}
+
+// ── 12. XP ───────────────────────────────────────────────────────────────
+//
+// Motivational only — see src/lib/xp.ts. XP is never read by roadmap
+// unlock logic (src/lib/roadmap.ts); it is purely a side effect of
+// completion events, never an input to them. UserXP.totalXP is a
+// denormalized running total, incremented transactionally alongside each
+// XPEvent insert; XPEvent itself is the append-only audit/reconciliation
+// source and is never summed on normal reads.
+
+model UserXP {
+  userId    String   @id
+  totalXP   Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum XPReason {
+  LESSON_COMPLETED
+  UNIT_EXAM_PASSED
+  PRACTICE_TEST_COMPLETED
+  DAILY_GOAL_MET
+  STREAK_BONUS
+}
+
+model XPEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int
+  reason    XPReason
+  refId     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

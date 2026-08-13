@@ -1,0 +1,27 @@
+-- CreateTable
+CREATE TABLE `UserXP` (
+    `userId` VARCHAR(191) NOT NULL,
+    `totalXP` INTEGER NOT NULL DEFAULT 0,
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`userId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `XPEvent` (
+    `id` VARCHAR(191) NOT NULL,
+    `userId` VARCHAR(191) NOT NULL,
+    `amount` INTEGER NOT NULL,
+    `reason` ENUM('LESSON_COMPLETED', 'UNIT_EXAM_PASSED', 'PRACTICE_TEST_COMPLETED', 'DAILY_GOAL_MET', 'STREAK_BONUS') NOT NULL,
+    `refId` VARCHAR(191) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    INDEX `XPEvent_userId_createdAt_idx`(`userId`, `createdAt`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `UserXP` ADD CONSTRAINT `UserXP_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `XPEvent` ADD CONSTRAINT `XPEvent_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

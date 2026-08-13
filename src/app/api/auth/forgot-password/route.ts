@@ -3,9 +3,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { forgotPasswordSchema } from "@/lib/validations/auth";
 import { sendPasswordResetEmail } from "@/lib/mail";
+import { enforceRateLimit, AUTH_RATE_LIMITS } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
 
 export async function POST(req: Request) {
+  const limited = enforceRateLimit(req, "auth-forgot-password", AUTH_RATE_LIMITS.forgotPassword);
+  if (limited) return limited;
+
   try {
     const body = await req.json();
     const parsed = forgotPasswordSchema.safeParse(body);
