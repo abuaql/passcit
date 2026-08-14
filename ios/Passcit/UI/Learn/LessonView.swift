@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LessonView: View {
     @State private var viewModel: LessonViewModel
+    @State private var showLanguagePicker = false
     let apiClient: APIClient
     let studyLanguageStore: StudyLanguageStore
     var onCompleted: () -> Void
@@ -114,34 +115,89 @@ struct LessonView: View {
         .accessibilityElement(children: .combine)
     }
 
+    // A single centered row, always exactly 3 buttons — Back is disabled
+    // rather than removed on the first question, so the row's width (and
+    // therefore its centering) never shifts as the learner moves through
+    // the lesson. Every button shares one control size, one .lineLimit(1),
+    // and one minimumScaleFactor, which is what actually guarantees equal
+    // height and no clipping/wrapping on a narrow screen: SwiftUI sizes a
+    // Button to its label, so if the label were ever allowed to wrap to a
+    // second line, that one button would grow taller than its neighbors.
+    private static let navButtonControlSize: ControlSize = .regular
+    private static let navButtonMinScale: CGFloat = 0.8
+
     @ViewBuilder
     private var navigationButtons: some View {
-        HStack {
-            if viewModel.currentIndex > 0 {
-                Button("Back") { viewModel.goToPreviousQuestion() }
-                    .buttonStyle(.bordered)
-            }
-            Spacer()
-            if viewModel.isLastQuestion {
-                Button {
-                    Task {
-                        if await viewModel.completeLesson() {
-                            onCompleted()
-                        }
-                    }
-                } label: {
-                    if viewModel.isCompleting {
-                        ProgressView()
-                    } else {
-                        Text("Complete Lesson")
+        HStack(spacing: 8) {
+            Spacer(minLength: 0)
+            backButton
+            languageButton
+            primaryActionButton
+            Spacer(minLength: 0)
+        }
+        .sheet(isPresented: $showLanguagePicker) {
+            LanguagePickerView(store: studyLanguageStore)
+        }
+    }
+
+    private var backButton: some View {
+        Button {
+            viewModel.goToPreviousQuestion()
+        } label: {
+            Label("Back", systemImage: "chevron.left")
+                .lineLimit(1)
+                .minimumScaleFactor(Self.navButtonMinScale)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(Self.navButtonControlSize)
+        .disabled(viewModel.currentIndex == 0)
+    }
+
+    private var languageButton: some View {
+        Button {
+            showLanguagePicker = true
+        } label: {
+            Label(studyLanguageStore.selectedLanguage.nativeName, systemImage: "globe")
+                .lineLimit(1)
+                .minimumScaleFactor(Self.navButtonMinScale)
+        }
+        .buttonStyle(.bordered)
+        .tint(.accentColor)
+        .controlSize(Self.navButtonControlSize)
+        .accessibilityLabel("Study language: \(studyLanguageStore.selectedLanguage.englishName)")
+    }
+
+    @ViewBuilder
+    private var primaryActionButton: some View {
+        if viewModel.isLastQuestion {
+            Button {
+                Task {
+                    if await viewModel.completeLesson() {
+                        onCompleted()
                     }
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(viewModel.isCompleting)
-            } else {
-                Button("Next") { viewModel.goToNextQuestion() }
-                    .buttonStyle(.borderedProminent)
+            } label: {
+                if viewModel.isCompleting {
+                    ProgressView()
+                } else {
+                    Text("Complete")
+                        .lineLimit(1)
+                        .minimumScaleFactor(Self.navButtonMinScale)
+                }
             }
+            .buttonStyle(.borderedProminent)
+            .controlSize(Self.navButtonControlSize)
+            .disabled(viewModel.isCompleting)
+        } else {
+            Button {
+                viewModel.goToNextQuestion()
+            } label: {
+                Label("Next", systemImage: "chevron.right")
+                    .lineLimit(1)
+                    .minimumScaleFactor(Self.navButtonMinScale)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(Self.navButtonControlSize)
         }
     }
 }
