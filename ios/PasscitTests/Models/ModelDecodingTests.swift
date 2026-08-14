@@ -15,6 +15,15 @@ struct ModelDecodingTests {
         #expect(user.email == "jane@example.com")
         #expect(user.image == nil)
         #expect(user.role == .user)
+        #expect(user.studyLanguage == nil, "native login/register/apple/google responses never include this")
+    }
+
+    @Test func decodesUserMeResponseWithStudyLanguage() throws {
+        let json = """
+        {"user":{"id":"u_1","name":"Jane Doe","email":"jane@example.com","image":null,"role":"USER","studyLanguage":"KO"}}
+        """
+        let response = try JSONDecoder().decode(UserMeResponse.self, from: Data(json.utf8))
+        #expect(response.user.studyLanguage == .ko)
     }
 
     @Test func decodesAuthResponse() throws {

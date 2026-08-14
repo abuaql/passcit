@@ -17,7 +17,7 @@ struct AccountSettingsViewModelTests {
     // .signedIn(cached) synchronously, then a failed reconciliation
     // fetch (unreachable port) is swallowed and the optimistic
     // .signedIn state is kept — see AuthManager.bootstrap().
-    private func makeAuthManager(signedInAs user: User = User(id: "u_1", name: "Jane Doe", email: "jane@example.com", image: nil, role: .user)) async -> AuthManager {
+    private func makeAuthManager(signedInAs user: User = User(id: "u_1", name: "Jane Doe", email: "jane@example.com", image: nil, role: .user, studyLanguage: nil)) async -> AuthManager {
         let sessionStore = SessionStore(service: "com.passcit.app.tests.accountsettings")
         sessionStore.clear()
         sessionStore.saveTokens(TokenPair(accessToken: "at1", refreshToken: "rt1", expiresIn: 900, tokenType: "Bearer"))

@@ -12,10 +12,11 @@ describe("getPublicUser", () => {
     try {
       const result = await getPublicUser(user.id);
       assert.ok(result);
-      assert.deepEqual(Object.keys(result!).sort(), ["email", "id", "image", "name", "role"]);
+      assert.deepEqual(Object.keys(result!).sort(), ["email", "id", "image", "name", "role", "studyLanguage"]);
       assert.equal(result!.id, user.id);
       assert.equal(result!.email, user.email);
       assert.equal(result!.role, "USER");
+      assert.equal(result!.studyLanguage, "EN", "new users default to English until they pick a language");
     } finally {
       await deleteTestUser(user.id);
     }

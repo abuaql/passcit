@@ -3,10 +3,13 @@ import SwiftUI
 struct PracticeView: View {
     @Environment(AuthManager.self) private var authManager
     @State private var viewModel: PracticeViewModel
+    @State private var showExitConfirmation = false
+    let apiClient: APIClient
     var onSignInTapped: () -> Void
 
     init(apiClient: APIClient, onSignInTapped: @escaping () -> Void) {
         _viewModel = State(initialValue: PracticeViewModel(practiceService: PracticeService(apiClient: apiClient)))
+        self.apiClient = apiClient
         self.onSignInTapped = onSignInTapped
     }
 
@@ -15,6 +18,30 @@ struct PracticeView: View {
             content
                 .navigationTitle(navigationTitle)
                 .navigationBarTitleDisplayMode(viewModel.phase == .idle ? .automatic : .inline)
+                .toolbar { exitToolbarItem }
+                .confirmationDialog(
+                    "Exit this practice session?",
+                    isPresented: $showExitConfirmation,
+                    titleVisibility: .visible
+                ) {
+                    Button("Exit Practice", role: .destructive) { viewModel.returnToModeSelection() }
+                    Button("Keep Practicing", role: .cancel) {}
+                } message: {
+                    Text("Your answers on this test won't be saved.")
+                }
+        }
+    }
+
+    // Only shown while a session is actually running — every mode
+    // (Random/Category/Missed/Mock Interview) shares this one view/view
+    // model, so a single toolbar item covers all four per the product
+    // requirement that leaving mid-session must always be possible.
+    @ToolbarContentBuilder
+    private var exitToolbarItem: some ToolbarContent {
+        if viewModel.phase == .inProgress || viewModel.phase == .submitting {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Exit") { showExitConfirmation = true }
+            }
         }
     }
 
@@ -79,7 +106,7 @@ struct PracticeView: View {
         case .finished:
             if let result = viewModel.result {
                 PracticeResultView(result: result) {
-                    Task { await viewModel.startNewTest() }
+                    viewModel.returnToModeSelection()
                 }
             }
         }
@@ -129,9 +156,48 @@ struct PracticeView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(viewModel.isStarting || !viewModel.canStart)
+
+                flashcardsEntryPoint
             }
             .padding()
         }
+    }
+
+    // Flashcards is deliberately not a PracticeMode — it's un-scored,
+    // self-paced review with its own flip-card UI, not a 10/20-question
+    // test. Surfaced here as its own entry point rather than a 5th mode
+    // card, so it isn't confused with the scored modes above it.
+    private var flashcardsEntryPoint: some View {
+        NavigationLink {
+            FlashcardDeckView(apiClient: apiClient)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "rectangle.on.rectangle")
+                    .font(.title3)
+                    .frame(width: 28)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Study with Flashcards")
+                        .font(.subheadline.bold())
+                    Text("Flip through questions at your own pace. Not scored.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.tertiarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(Color(.separator), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.primary)
     }
 
     private func modeCard(_ mode: PracticeMode) -> some View {

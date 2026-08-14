@@ -4,12 +4,15 @@ struct LearnView: View {
     @Environment(AuthManager.self) private var authManager
     private let apiClient: APIClient
     @State private var viewModel: LearnViewModel
+    @State private var studyLanguageStore: StudyLanguageStore
     @State private var path: [LearnRoute] = []
+    @State private var showLanguagePicker = false
     var onSignInTapped: () -> Void
 
     init(apiClient: APIClient, onSignInTapped: @escaping () -> Void) {
         self.apiClient = apiClient
         _viewModel = State(initialValue: LearnViewModel(learnService: LearnService(apiClient: apiClient)))
+        _studyLanguageStore = State(initialValue: StudyLanguageStore(studyContentService: StudyContentService(apiClient: apiClient)))
         self.onSignInTapped = onSignInTapped
     }
 
@@ -20,6 +23,26 @@ struct LearnView: View {
                 .navigationDestination(for: LearnRoute.self) { route in
                     destination(for: route)
                 }
+                .toolbar {
+                    if case .signedIn = authManager.state {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                showLanguagePicker = true
+                            } label: {
+                                Image(systemName: "globe")
+                            }
+                            .accessibilityLabel("Study language: \(studyLanguageStore.selectedLanguage.englishName)")
+                        }
+                    }
+                }
+                .sheet(isPresented: $showLanguagePicker) {
+                    LanguagePickerView(store: studyLanguageStore)
+                }
+        }
+        .task(id: authManager.state) {
+            if case .signedIn(let user) = authManager.state {
+                studyLanguageStore.adopt(from: user)
+            }
         }
     }
 
@@ -113,7 +136,7 @@ struct LearnView: View {
     private func destination(for route: LearnRoute) -> some View {
         switch route {
         case .lesson(let id):
-            LessonView(apiClient: apiClient, lessonId: id) {
+            LessonView(apiClient: apiClient, lessonId: id, studyLanguageStore: studyLanguageStore) {
                 path.removeLast()
                 Task { await viewModel.refresh() }
             }

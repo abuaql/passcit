@@ -52,6 +52,11 @@ model User {
   // honest tradeoff of stateless sessions rather than a gap.
   isActive      Boolean   @default(true)
 
+  // Preferred language for AI-generated study content (explanations,
+  // translations, memory tips) and for text-to-speech. The official USCIS
+  // question and answer are always shown in English regardless.
+  studyLanguage StudyLanguage @default(EN)
+
   // Which TestVersion this user is currently studying. Nullable rather
   // than defaulting to a specific row (Prisma defaults can't reference
   // another table) — application code falls back to TestVersion.isDefault
@@ -84,6 +89,7 @@ model User {
   unitExamAttempts  UnitExamAttempt[]
   xp                UserXP?
   xpEvents          XPEvent[]
+  studyActions      StudyActionEvent[]
 
   @@index([role])
   @@index([activeTestVersionId])
@@ -283,6 +289,8 @@ model Question {
   interviewAnswers InterviewCivicsAnswer[]
   lessonQuestions   LessonQuestion[]
   unitExamQuestions UnitExamQuestion[]
+  studyContent      QuestionStudyContent[]
+  studyActions      StudyActionEvent[]
 
   @@unique([testVersionId, number])
   @@index([category])
@@ -856,4 +864,172 @@ model XPEvent {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+}
+
+// ── 13. AI-generated study content ─────────────────────────────────────
+//
+// Restored from the pre-roadmap version of this app (see
+// ~/Downloads/passcit at commit e0c630d) — the old web app's Study Panel
+// feature (explanation / translation / memory tip / Listen on each
+// question), now ported to power the same experience in the native iOS
+// Learn tab. Layered entirely on top of the existing Question bank; no
+// question content is duplicated or altered by anything here.
+
+/// Languages offered for AI-generated study content.
+///
+/// Modelled as an enum rather than a free String deliberately: the cache
+/// key for generated content is (questionId, language), so any drift in
+/// how a language is spelled — "es" vs "ES" vs "spanish" — would silently
+/// create a second row and pay the generation cost again for content that
+/// already exists. The database constraint makes that class of mistake
+/// impossible. Adding a language later is a one-line migration.
+enum StudyLanguage {
+  EN // English (default — also the language of the official USCIS content)
+  AR // العربية
+  ES // Español
+  HI // हिन्दी
+  UR // اردو
+  FR // Français
+  PT // Português
+  ZH // 中文
+  RU // Русский
+  KO // 한국어
+  VI // Tiếng Việt
+  TL // Tagalog
+}
+
+/// One row per (question, language) holding every kind of generated study
+/// content for that pair.
+///
+/// Each field is NULL until the user first presses the button that needs
+/// it, then filled in and kept permanently — so a question the user only
+/// ever asks for a memory tip on never pays to generate an explanation.
+/// Deliberately one row rather than a row per content type: the three
+/// kinds share a cache key exactly, and separate rows would mean three
+/// lookups and three inserts for the same conceptual entry.
+///
+/// Content here is never regenerated except by explicit administrator
+/// action; ordinary reads always return what is already stored.
+model QuestionStudyContent {
+  id         String        @id @default(cuid())
+  questionId String
+  language   StudyLanguage
+
+  /// Why the answer is correct, with context, written for the selected language.
+  explanation        String? @db.Text
+  /// The official question, translated. Never replaces the English original.
+  translatedQuestion String? @db.Text
+  /// The official answer, translated. Never replaces the English original.
+  translatedAnswer   String? @db.Text
+  /// A mnemonic, association, or everyday analogy for recalling the answer.
+  memoryTip          String? @db.Text
+
+  // Status and provenance are tracked per content type rather than once per
+  // row. A single status could not express "explanation completed, memory
+  // tip failed, translation never requested", which is the normal state of
+  // a row given the three are generated independently on demand. Recording
+  // aiVersion per type is likewise what makes it possible to regenerate
+  // just the explanations with a newer model while leaving everything else
+  // untouched. Translation is one unit: question and answer come from a
+  // single call, so they share one status.
+  explanationStatus      StudyContentStatus @default(PENDING)
+  explanationAiVersion   String?
+  explanationGeneratedAt DateTime?
+  explanationDurationMs  Int?
+
+  translationStatus      StudyContentStatus @default(PENDING)
+  translationAiVersion   String?
+  translationGeneratedAt DateTime?
+  translationDurationMs  Int?
+
+  memoryTipStatus        StudyContentStatus @default(PENDING)
+  memoryTipAiVersion     String?
+  memoryTipGeneratedAt   DateTime?
+  memoryTipDurationMs    Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, language])
+}
+
+/// Lifecycle of one kind of generated content.
+///
+/// GENERATING is a claim held by whichever request won the atomic update
+/// that set it — that is what stops two people opening the same question in
+/// the same language from both paying for a generation. A status column on
+/// its own would not prevent that; only the conditional write does.
+enum StudyContentStatus {
+  PENDING // never requested
+  GENERATING // a request holds the claim right now
+  COMPLETED // content is stored and served from cache
+  FAILED // last attempt failed; the user may retry
+}
+
+enum StudyActionType {
+  EXPLANATION
+  TRANSLATION
+  MEMORY_TIP
+  LISTEN
+}
+
+/// One row per study action, for understanding which aids people actually
+/// use and in which languages. Deliberately records the action and its
+/// language only — never the generated text, which already lives in
+/// QuestionStudyContent and would be duplicated here for no benefit.
+model StudyActionEvent {
+  id         String          @id @default(cuid())
+  userId     String
+  questionId String
+  action     StudyActionType
+  language   StudyLanguage
+  createdAt  DateTime        @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([questionId, action])
+  @@index([action, createdAt])
+}
+
+/// Which kind of study content a generation produced.
+enum AIContentType {
+  EXPLANATION
+  TRANSLATION
+  MEMORY_TIP
+}
+
+/// One row per completed OpenAI call, for cost and usage analysis.
+///
+/// Never shown to end users. Deliberately stores no userId: rate limiting
+/// already handles abuse in real time, and cost analysis needs the shape of
+/// spend (which content type, which language, which model), not who caused
+/// it. Add a nullable userId later if per-user attribution is wanted.
+///
+/// Token counts are reported by the API and are exact. estimatedCostUsd is
+/// derived from a local price table and will drift when OpenAI changes
+/// pricing — treat it as an estimate, and recompute from tokens if exact
+/// figures are ever needed.
+model AIGenerationLog {
+  id String @id @default(cuid())
+
+  questionId  String?
+  language    StudyLanguage
+  contentType AIContentType
+
+  model            String
+  promptTokens     Int
+  completionTokens Int
+  totalTokens      Int
+  estimatedCostUsd Float?
+  durationMs       Int
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([contentType])
+  @@index([language])
 }

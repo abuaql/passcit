@@ -6,11 +6,20 @@
 
 import { prisma } from "@/lib/prisma";
 import type { VerifiedCredentialsUser } from "@/lib/native-auth/credentials";
+import type { StudyLanguage } from "@/generated/prisma/client";
+
+// Extends (rather than modifies) VerifiedCredentialsUser deliberately —
+// that type is shared with native login/register/OAuth, which don't need
+// studyLanguage in their response. Only GET /api/user/me does, since
+// that's what the iOS Study Panel's language picker initializes from.
+export interface PublicUser extends VerifiedCredentialsUser {
+  studyLanguage: StudyLanguage;
+}
 
 /** Explicit `select` — never `include` — so this can never accidentally start returning passwordHash or any other field added to User later. */
-export async function getPublicUser(userId: string): Promise<VerifiedCredentialsUser | null> {
+export async function getPublicUser(userId: string): Promise<PublicUser | null> {
   return prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, name: true, email: true, image: true, role: true },
+    select: { id: true, name: true, email: true, image: true, role: true, studyLanguage: true },
   });
 }

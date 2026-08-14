@@ -420,6 +420,60 @@ struct PracticeViewModelTests {
         #expect(viewModel.activeMode == .mockInterview)
     }
 
+    // MARK: Exiting / returning to the mode selector
+
+    @Test func returnToModeSelectionFromAnInProgressSessionGoesToIdleWithoutCallingTheServer() async throws {
+        let mock = MockPracticeService()
+        mock.startResult = .success(PracticeFixtures.startResponse(questions: [
+            PracticeFixtures.question(id: "q1"), PracticeFixtures.question(id: "q2"),
+        ]))
+        let viewModel = PracticeViewModel(practiceService: mock)
+        await viewModel.startNewTest()
+        viewModel.select(viewModel.currentQuestion!.options[0], for: "q1")
+        viewModel.goToNextQuestion()
+
+        viewModel.returnToModeSelection()
+
+        #expect(viewModel.phase == .idle)
+        #expect(viewModel.questions.isEmpty)
+        #expect(viewModel.currentIndex == 0)
+        #expect(viewModel.selectedOptions.isEmpty)
+        #expect(viewModel.errorMessage == nil)
+        #expect(mock.completeCallCount == 0, "leaving mid-session must never call complete")
+    }
+
+    @Test func returnToModeSelectionAfterFinishingDoesNotAutoStartAnotherTest() async throws {
+        let q1 = PracticeFixtures.question(id: "q1")
+        let mock = MockPracticeService()
+        mock.startResult = .success(PracticeFixtures.startResponse(questions: [q1]))
+        mock.completeResult = .success(PracticeTestResult(score: 1, totalQuestions: 1, passed: true, stoppedEarly: false))
+        let viewModel = PracticeViewModel(practiceService: mock)
+        await viewModel.startNewTest()
+        viewModel.select(q1.options[0], for: "q1")
+        await viewModel.submit()
+        #expect(viewModel.phase == .finished)
+
+        viewModel.returnToModeSelection()
+
+        #expect(viewModel.phase == .idle)
+        #expect(viewModel.result == nil)
+        #expect(mock.startCallCount == 1, "must not silently start a second test")
+    }
+
+    @Test func returnToModeSelectionPreservesTheLastSelectedModeAndCategory() async throws {
+        let mock = MockPracticeService()
+        mock.startResult = .success(PracticeFixtures.startResponse(questions: [PracticeFixtures.question(id: "q1")]))
+        let viewModel = PracticeViewModel(practiceService: mock)
+        viewModel.selectedMode = .category
+        viewModel.selectedCategory = .americanHistory
+        await viewModel.startNewTest()
+
+        viewModel.returnToModeSelection()
+
+        #expect(viewModel.selectedMode == .category, "the learner's last choice should still be pre-selected")
+        #expect(viewModel.selectedCategory == .americanHistory)
+    }
+
     // MARK: Reset on a new test
 
     @Test func startingANewTestWithADifferentModeUpdatesActiveModeAndThresholds() async throws {

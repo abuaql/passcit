@@ -26,17 +26,16 @@ struct InterviewWritingView: View {
                 .buttonStyle(.borderedProminent)
                 .accessibilityHint("Plays the sentence aloud again")
 
-                TextField("Type what you heard", text: $typedAnswer, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .accessibilityLabel("Typed answer")
-
-                Button("Submit") {
-                    let answer = typedAnswer
-                    typedAnswer = ""
-                    onSubmitTyped(answer)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(typedAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSubmitting)
+                TypedAnswerField(
+                    placeholder: "Type what you heard",
+                    text: $typedAnswer,
+                    isSubmitting: isSubmitting,
+                    onSubmit: {
+                        let answer = typedAnswer
+                        typedAnswer = ""
+                        onSubmitTyped(answer)
+                    }
+                )
             }
             .padding()
         }

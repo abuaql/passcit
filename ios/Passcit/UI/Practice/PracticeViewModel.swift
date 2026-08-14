@@ -147,4 +147,26 @@ final class PracticeViewModel {
             phase = .inProgress
         }
     }
+
+    /// Abandons whatever is currently on screen — a session the learner
+    /// exited early, or a just-finished result — and lands back on the
+    /// mode-selection screen. Deliberately does not call the server: an
+    /// incomplete PracticeTest is already harmless to leave behind (it
+    /// simply never gets a `complete` call), matching how the old web app
+    /// tolerated navigating away mid-session. `selectedMode`/
+    /// `selectedCategory` are intentionally left untouched so "Start
+    /// Practice Test" still offers the learner's last choice, while still
+    /// letting them pick a different mode immediately.
+    func returnToModeSelection() {
+        phase = .idle
+        errorMessage = nil
+        testId = nil
+        questions = []
+        currentIndex = 0
+        selectedOptions = [:]
+        result = nil
+        passThreshold = nil
+        questionsAsked = nil
+        activeMode = nil
+    }
 }

@@ -2,10 +2,14 @@ import SwiftUI
 
 struct LessonView: View {
     @State private var viewModel: LessonViewModel
+    let apiClient: APIClient
+    let studyLanguageStore: StudyLanguageStore
     var onCompleted: () -> Void
 
-    init(apiClient: APIClient, lessonId: String, onCompleted: @escaping () -> Void) {
+    init(apiClient: APIClient, lessonId: String, studyLanguageStore: StudyLanguageStore, onCompleted: @escaping () -> Void) {
         _viewModel = State(initialValue: LessonViewModel(lessonId: lessonId, learnService: LearnService(apiClient: apiClient)))
+        self.apiClient = apiClient
+        self.studyLanguageStore = studyLanguageStore
         self.onCompleted = onCompleted
     }
 
@@ -59,10 +63,27 @@ struct LessonView: View {
                         .foregroundStyle(.secondary)
                 }
 
-                if let explanation = question.explanation, viewModel.selectedOptions[question.id] != nil || question.variesByLocation {
+                let hasRevealed = viewModel.selectedOptions[question.id] != nil || question.variesByLocation
+
+                if let explanation = question.explanation, hasRevealed {
                     Text(explanation)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                }
+
+                // Only offered once the learner has engaged with the
+                // question (answered it, or it's a variesByLocation
+                // question with no single answer to guess) — never
+                // spoils the answer up front.
+                if hasRevealed {
+                    StudyPanelView(
+                        questionId: question.id,
+                        officialQuestion: question.question,
+                        officialAnswer: question.answers.first ?? "",
+                        language: studyLanguageStore.selectedLanguage,
+                        apiClient: apiClient
+                    )
+                    .id(question.id)
                 }
 
                 navigationButtons

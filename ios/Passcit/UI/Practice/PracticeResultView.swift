@@ -5,7 +5,11 @@ import SwiftUI
 // response), never recomputed on the client.
 struct PracticeResultView: View {
     let result: PracticeTestResult
-    var onStartAnother: () -> Void
+    // Deliberately returns to the mode selector rather than immediately
+    // re-launching the same mode — the learner should be able to pick a
+    // different mode (or the same one) on the next screen, not be forced
+    // straight back into another 10/20-question run.
+    var onBackToPractice: () -> Void
 
     var body: some View {
         VStack(spacing: 20) {
@@ -24,7 +28,7 @@ struct PracticeResultView: View {
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
-            Button("Start Another Test", action: onStartAnother)
+            Button("Back to Practice", action: onBackToPractice)
                 .buttonStyle(.borderedProminent)
         }
         .padding(32)

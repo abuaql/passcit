@@ -9,7 +9,7 @@
  * it's a readable one-line format instead.
  */
 
-type LogLevel = "info" | "warn" | "error";
+type LogLevel = "debug" | "info" | "warn" | "error";
 
 function serializeError(error: unknown): unknown {
   if (error instanceof Error) {
@@ -20,6 +20,12 @@ function serializeError(error: unknown): unknown {
 
 function emit(level: LogLevel, context: string, message: string, error?: unknown) {
   const isProd = process.env.NODE_ENV === "production";
+
+  // Debug output is for working on the app, not for running it. Dropping it in
+  // production keeps hot paths quiet without losing anything operationally
+  // meaningful — warn and error still emit everywhere.
+  if (level === "debug" && isProd) return;
+
   const timestamp = new Date().toISOString();
 
   if (isProd) {
@@ -40,10 +46,13 @@ function emit(level: LogLevel, context: string, message: string, error?: unknown
   const prefix = `[${timestamp}] ${level.toUpperCase()} ${context}:`;
   if (level === "error") console.error(prefix, message, error ?? "");
   else if (level === "warn") console.warn(prefix, message, error ?? "");
+  else if (level === "debug") console.debug(prefix, message, error ?? "");
   else console.log(prefix, message);
 }
 
 export const logger = {
+  /** Development only — silently dropped in production. */
+  debug: (context: string, message: string, error?: unknown) => emit("debug", context, message, error),
   info: (context: string, message: string) => emit("info", context, message),
   warn: (context: string, message: string, error?: unknown) => emit("warn", context, message, error),
   /** `context` should identify where this happened, e.g. "api.admin.questions.create". */

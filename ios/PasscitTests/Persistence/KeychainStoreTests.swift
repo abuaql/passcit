@@ -41,7 +41,7 @@ final class KeychainStoreTests {
     }
 
     @Test func codableConvenienceRoundTrips() {
-        let user = User(id: "u_1", name: "Jane", email: "jane@example.com", image: nil, role: .user)
+        let user = User(id: "u_1", name: "Jane", email: "jane@example.com", image: nil, role: .user, studyLanguage: nil)
         store.setCodable(user, for: "test-key")
         #expect(store.getCodable(User.self, for: "test-key") == user)
     }

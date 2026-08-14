@@ -18,12 +18,16 @@
 		0D29920792FE6579B4829A28 /* InterviewAnswer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4206B8E232E8A673FC3F66 /* InterviewAnswer.swift */; };
 		0DA9A79A80A6D702447789C1 /* PracticeResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63145804548FCD54EFDC3D17 /* PracticeResultView.swift */; };
 		0E3B4226DF96489E32CBC696 /* AccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4519CBCF469D5856A363C1A7 /* AccountSettingsView.swift */; };
+		10C943959FFCEBF801B4210B /* LanguagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E174C7584F76C8B1D08C6AC /* LanguagePickerView.swift */; };
 		12E0643CB9D557172EDD15CD /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EEB4F089EBDB615777AED2 /* RegisterView.swift */; };
+		15234163A8B8C7B4C2933CB6 /* StudyLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F91467898F253345FBB5119 /* StudyLanguage.swift */; };
 		15EC0F20D8FC61FDD27E2AF4 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3334AB6669AF77A7428AE1FB /* SessionStore.swift */; };
 		1CA610443E7D73E51F7EE3BB /* AppleCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89B777636ED7302025DA746 /* AppleCredential.swift */; };
 		1D3EEF784679669F5FFA7587 /* InterviewHistoryViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C379EF1C9F73135168707E2 /* InterviewHistoryViewModelTests.swift */; };
 		234B4A6CC97A1FB9667A2C8B /* AudioSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0492D71E77132152DA4BF4DA /* AudioSessionCoordinator.swift */; };
+		279A4B0F897941A121F0E6B9 /* StudyLanguageStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD2243DD9D1D9ECD447B53F6 /* StudyLanguageStoreTests.swift */; };
 		2885220F0D8A0060316446DE /* EligibilityResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D893EAE457F4AEF42B762 /* EligibilityResultView.swift */; };
+		2B7347C9A1D3826EC0B5758F /* StudyPanelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 340A4BF4B3F153BCCF817036 /* StudyPanelViewModel.swift */; };
 		2C2A02ED4358D7B962F31BB6 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C614AD0A3DAD655AD7F6B99F /* LoadingView.swift */; };
 		2EE488AE9E025FB52C5A4A54 /* EligibilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E16C2ED13B4C3A04C034EF29 /* EligibilityService.swift */; };
 		3415275D5CEB3B705D31B9DB /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55A32B6F3C388FE03B31451 /* AuthViewModel.swift */; };
@@ -41,12 +45,15 @@
 		3F881107A9CA488266B95375 /* EligibilityViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D9DDB1725593D429FA88FA /* EligibilityViewModelTests.swift */; };
 		3F96778577DB128F650BD34D /* InterviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE466669BF457225C10551B /* InterviewView.swift */; };
 		407F054825CB8C5A4A9F2280 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB61227A3B9D468A13389B51 /* Assets.xcassets */; };
+		417F491490C83CF6993FDC54 /* StudyContentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5D4CD585C7A545D7CD1A10 /* StudyContentService.swift */; };
 		422ACB2D4A23AEE843B183FB /* LessonRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F2E3F0E303315847663B0 /* LessonRowView.swift */; };
 		42AD379D554A10AC4E2050B6 /* SpeechSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDB9D4DA9CE43FD6583288E /* SpeechSynthesizer.swift */; };
 		44E5434BBF703A99B132D518 /* LearnModelDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0F28FD5D02E3E778BD3844 /* LearnModelDecodingTests.swift */; };
 		4BEE0E46C241CD96B4CB1D10 /* UnitExamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1875C620543B39EC29A0DE52 /* UnitExamView.swift */; };
+		52FC4A6BA6621714FF769492 /* FlashcardDeckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 679049B385496F745FDA06B0 /* FlashcardDeckView.swift */; };
 		53B7B2599C4F2916F4785848 /* InterviewDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304B89C1A982F0772E66FF80 /* InterviewDetailView.swift */; };
 		54936DDFE3C2FF7CC35829E6 /* StartLearningCTAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E052E9DCFAC882E6F34C060 /* StartLearningCTAView.swift */; };
+		54EB45F5B657B12E56EFA71A /* QuestionDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAA468186EE98D9E8099D84 /* QuestionDetail.swift */; };
 		56A9D320F30658E142BDABA5 /* EligibilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C14C4D31B2EB16ACBB7A8B /* EligibilityView.swift */; };
 		5830777CAFE405A36A82042C /* LearnQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A3FC601EE4849AC3D245341 /* LearnQuestionView.swift */; };
 		5CFC88F6286F2DCB9D2353B5 /* RoadmapTeaserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F30750508196CD566373C28D /* RoadmapTeaserView.swift */; };
@@ -57,9 +64,11 @@
 		6C811B8ACB14A9B270223F74 /* EligibilityFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D7AF7D4D7B4E47846B69B31 /* EligibilityFormView.swift */; };
 		71F6F34CC2D9EFF6D0669483 /* MockAudioInfrastructure.swift in Sources */ = {isa = PBXBuildFile; fileRef = D724BD4E17B15ED0D1636CD5 /* MockAudioInfrastructure.swift */; };
 		7267F6A0806C380D4FEDF01B /* ModelDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF52770AE566B401918ACFB8 /* ModelDecodingTests.swift */; };
+		74344D68BD884C70039CE276 /* FlashcardDeckViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1054F9BB8F9B351D6078DD4 /* FlashcardDeckViewModel.swift */; };
 		745E01502ECD5CB3456182C3 /* PracticeModelDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34FA2B3F98F4BBF1E630621F /* PracticeModelDecodingTests.swift */; };
 		78BBCB860E43BE57BC077456 /* LessonQuestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8837E2EE7A2FCC2A0F48CBFF /* LessonQuestion.swift */; };
 		7AF70B67DF242F4419B4DCF1 /* TokenRefreshCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B977434AA453531F34CBCDF /* TokenRefreshCoordinator.swift */; };
+		7D844C079B386FB0503F593D /* QuestionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33424619904AFC8B97256425 /* QuestionsService.swift */; };
 		7DF76F7E7175A06943786D1F /* InterviewFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01B758EDB9304C4F73BB6AC4 /* InterviewFixtures.swift */; };
 		80144719D5704BD750A518AF /* InterviewIdentityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30135A15337765023FCB5C9 /* InterviewIdentityView.swift */; };
 		818AAFAADB0148AC6DF19DA3 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A525C10EA5CB3F7EB633A422 /* HTTPMethod.swift */; };
@@ -81,8 +90,10 @@
 		96CAA2B972D105A82BD5B169 /* EligibilityRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDF8D3AFF41E6CB096CBECC2 /* EligibilityRequest.swift */; };
 		973F9AD253271DF55C879BEE /* APIClientError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68460D30B015BED866BFBF0 /* APIClientError.swift */; };
 		978FEAA3ED2A20B45CB4D667 /* InterviewSimulation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E86747F71853BC23BC1BBD /* InterviewSimulation.swift */; };
+		98DF4F5592CE490058776237 /* StudyLanguageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B794F13B60974FA0339C37A /* StudyLanguageStore.swift */; };
 		99138928450B2151F917E4C0 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EB703E026F47190399B9F51 /* HomeViewModel.swift */; };
 		9A1367D69E0240C885DC4A23 /* LearnFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82EA6E2531D29E504CDC6163 /* LearnFixtures.swift */; };
+		9B924B828C995B51F48246D0 /* TypedAnswerField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0DF469EAAC5BDF4FAC4C166 /* TypedAnswerField.swift */; };
 		9C7962718504EF17AC58C763 /* ChangePasswordRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5BB751733BB4A3CD099476B /* ChangePasswordRequest.swift */; };
 		9C85C8C0BB3F96D63CCB4923 /* UnitExamViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CC376BBC4D8313D124C28A3 /* UnitExamViewModelTests.swift */; };
 		9D33D0EA0E4EA8E78495A9DB /* KeychainStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE95CC16373CFC17F0615A0D /* KeychainStoreTests.swift */; };
@@ -92,18 +103,24 @@
 		A605617E74D8A408B5AFD889 /* InterviewDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C3D8B00DD486DDF8BC3CA0 /* InterviewDetailViewModel.swift */; };
 		A751EE7F26E78B0EA7028ED1 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292BA05B39C28B63F443ACB9 /* KeychainStore.swift */; };
 		A7B5C4774B710A93983E93BF /* SessionStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0884E4E0D7CB4ADA4441FE1D /* SessionStoreTests.swift */; };
+		A8AF4EA194462FDDBC681E69 /* StudyContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044C493E822F8AF36C78DE0F /* StudyContent.swift */; };
 		A9930D5AD0C4BC41699978DF /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FF3E0507128972B339AADB /* EmptyStateView.swift */; };
 		AAE546C6F89D371AED2E0F11 /* PracticeFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514A14560971C947CBDE2933 /* PracticeFixtures.swift */; };
+		AAFA40A882965D4BAB17399E /* MockQuestionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2304158B4AD4CD1C4E7A449 /* MockQuestionsService.swift */; };
 		ABC0B3090636B5C1E0FFAF16 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107DF1F4C91BC91E46693834 /* APIError.swift */; };
 		AC2929447E9BAFFCEC8A7829 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434295C3CBA46DC2508B69CB /* AuthManager.swift */; };
 		AD677349B9765E2885D186AF /* UnitExam.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DD595430D0E8F21C8BED8E /* UnitExam.swift */; };
 		AF0C58B6C53E964D7FB82DBC /* InterviewWritingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30DD557676E094672F66D32C /* InterviewWritingView.swift */; };
+		B2D149608B806A69368693B6 /* Question.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CE4EDD8CB3A491150970D3 /* Question.swift */; };
 		B4C7826DC5F0BA244F2D7021 /* MockAudioInfrastructureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978A0AA2F66F803FEB45C40A /* MockAudioInfrastructureTests.swift */; };
+		B5914E05B7A46BA83BFDC2A2 /* QuestionFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2349BC937309EF7CC889D2 /* QuestionFixtures.swift */; };
 		B5BB7EA11E1593BA13EE79DB /* SpeechVoiceSelectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C7308BBA12F1B97ADD1874 /* SpeechVoiceSelectorTests.swift */; };
 		B746C8F19F9957304B98596E /* ContentVersionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25583A2741E35D9505C6F00 /* ContentVersionResponse.swift */; };
+		B7EE4FE6BE26003D08B7CD4E /* FlashcardDeckViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F74C00BFE1E0E8209C6AC0 /* FlashcardDeckViewModelTests.swift */; };
 		B87E07FB6373A4A3B69A4FFE /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A01E9DA5736A0EC48CE615 /* LoginView.swift */; };
 		BA9642B2FBAA89ECDB5FFD00 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A09F9641A0F464740EC22BF /* APIClient.swift */; };
 		BB9F3DE45A1A367A8D636AF0 /* InterviewService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FE347B72AB296415BB2274 /* InterviewService.swift */; };
+		BDB841B48499C1AA857125D5 /* StudyPanelViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094042158FE1C947EB033499 /* StudyPanelViewModelTests.swift */; };
 		BE13CC1DEF021478B54D8163 /* PracticeQuestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 623C0844F2D1527F985089A6 /* PracticeQuestionView.swift */; };
 		BEC8D399B29C62275A62260E /* AccountSettingsFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31921F3BC9915A7D8DD6704 /* AccountSettingsFixtures.swift */; };
 		BF3A5E7FE168979C5317788B /* AudioSessionCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F3D5CA0411CD274F3526A5 /* AudioSessionCoordinatorTests.swift */; };
@@ -114,6 +131,7 @@
 		CA21FD5446CEF2BC7B3702D3 /* PracticeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDD7737FD17C1AF0AB5F9ABA /* PracticeViewModel.swift */; };
 		CBDEEE4C4DD6EEFCDBE89A35 /* QuestionCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8604FB7E4C21C0295C175B /* QuestionCategory.swift */; };
 		CD1457125044DFEE450DF9C5 /* ProductIntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDD50C8F1E0206B84CE5585 /* ProductIntroView.swift */; };
+		CE19427699A7587381774D7F /* MockStudyContentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A44DBCB225A0DC19543F73 /* MockStudyContentService.swift */; };
 		CF563DF752A2627E7C30C736 /* PracticeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB9FB6DD05F831AD9AFB065 /* PracticeViewModelTests.swift */; };
 		D356EE3A1E71F13E8848E14F /* UnitRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F382782FD0A09881974C61 /* UnitRowView.swift */; };
 		D430F13E8B927E5B04A1910B /* AudioPermissionCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616606F57F2F1671DA1F6C13 /* AudioPermissionCoordinatorTests.swift */; };
@@ -121,6 +139,7 @@
 		D63F33E5E2DFB86B5C698CCE /* InterviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D1A74E3412668DA25BA88C /* InterviewViewModel.swift */; };
 		D7089A79BD158EC32245BA20 /* UserMeResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = C274A8F6564ABC27DD4AF56D /* UserMeResponse.swift */; };
 		DA343C5105FE5C5182371F85 /* AccountSettingsModelDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F93ED7469DD82A90984A480 /* AccountSettingsModelDecodingTests.swift */; };
+		DA4145EEACD14A9E0F9B0ADE /* StudyPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04C4166809F5EC22305787E /* StudyPanelView.swift */; };
 		DA5AE349832E288FCD4E5A86 /* PracticeQuestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4502B3E84852B81A11BC9EB9 /* PracticeQuestion.swift */; };
 		DBA6CAE53A9EB720934DFAA1 /* InterviewAnswerInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEE8B3DF6D85E04435316BB /* InterviewAnswerInputView.swift */; };
 		DCB0D600200537F32AFC2733 /* TestVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60104500DCA111A8F8E3C50F /* TestVersion.swift */; };
@@ -137,7 +156,9 @@
 		EAE7D8455097F1C1D3B7380D /* Unit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E855D833B9902958A8FFD44B /* Unit.swift */; };
 		EDC5BBE4A3391C43561B2E09 /* MockPracticeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44490D89CF6AAA9EF30C777 /* MockPracticeService.swift */; };
 		EE88683BE532AAD364FF1DC7 /* OAuthAuthResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0492AED49A9F5BA74574ACC6 /* OAuthAuthResponse.swift */; };
+		EF254CABA49F2D399FB7D533 /* MockStudySpeechSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C82437F9F8BF7E71B1D7D26 /* MockStudySpeechSynthesizer.swift */; };
 		F207D095A7D9779FE8F1E6D6 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0852021B903BF0DE68C5B97 /* ProfileView.swift */; };
+		F65A4C7B947D852ED3350587 /* StudyStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 571446F6A8DC727ECD0B24BB /* StudyStatus.swift */; };
 		F7B3CC71EF1CD8E156995813 /* DashboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF695FC1D8683B004A43F87 /* DashboardService.swift */; };
 		F850B06B2DAA187437E9BC3A /* InterviewHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614E741FA1232B9EEDEC25F9 /* InterviewHistoryView.swift */; };
 		FA6FD9C4C1B8553288835444 /* InterviewModelDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FD519C167DAE9312257BB0 /* InterviewModelDecodingTests.swift */; };
@@ -158,6 +179,7 @@
 /* Begin PBXFileReference section */
 		01B758EDB9304C4F73BB6AC4 /* InterviewFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewFixtures.swift; sourceTree = "<group>"; };
 		043A2F2237C44BC591A78C86 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		044C493E822F8AF36C78DE0F /* StudyContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StudyContent.swift; path = Passcit/Models/StudyContent.swift; sourceTree = SOURCE_ROOT; };
 		0492AED49A9F5BA74574ACC6 /* OAuthAuthResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthAuthResponse.swift; sourceTree = "<group>"; };
 		0492D71E77132152DA4BF4DA /* AudioSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionCoordinator.swift; sourceTree = "<group>"; };
 		04B9A5C95289EA36FCBFAEE6 /* LearnService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnService.swift; sourceTree = "<group>"; };
@@ -165,6 +187,7 @@
 		074F8CCC891AFC002B639EF3 /* InterviewReadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewReadingView.swift; sourceTree = "<group>"; };
 		0884E4E0D7CB4ADA4441FE1D /* SessionStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStoreTests.swift; sourceTree = "<group>"; };
 		08F55479ECFBF1142E442895 /* DeleteAccountSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountSheet.swift; sourceTree = "<group>"; };
+		094042158FE1C947EB033499 /* StudyPanelViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StudyPanelViewModelTests.swift; path = PasscitTests/Learn/StudyPanelViewModelTests.swift; sourceTree = SOURCE_ROOT; };
 		107DF1F4C91BC91E46693834 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		14EEB4F089EBDB615777AED2 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
 		15635643EBCAD143B00908DE /* InterviewDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewDetailViewModelTests.swift; sourceTree = "<group>"; };
@@ -174,6 +197,7 @@
 		1AB9FB6DD05F831AD9AFB065 /* PracticeViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeViewModelTests.swift; sourceTree = "<group>"; };
 		1D16419C85292C88400D9AE7 /* MockAccountSettingsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAccountSettingsService.swift; sourceTree = "<group>"; };
 		1DAE03F9138843FE88952D34 /* AudioPermissionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPermissionCoordinator.swift; sourceTree = "<group>"; };
+		1F91467898F253345FBB5119 /* StudyLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StudyLanguage.swift; path = Passcit/Models/StudyLanguage.swift; sourceTree = SOURCE_ROOT; };
 		20D9DDB1725593D429FA88FA /* EligibilityViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityViewModelTests.swift; sourceTree = "<group>"; };
 		2185AB724C08A171A2FBC787 /* InterviewResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewResultView.swift; sourceTree = "<group>"; };
 		21B6C498F47145A8F93CAEFD /* MockInterviewService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockInterviewService.swift; sourceTree = "<group>"; };
@@ -183,6 +207,8 @@
 		304B89C1A982F0772E66FF80 /* InterviewDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewDetailView.swift; sourceTree = "<group>"; };
 		30DD557676E094672F66D32C /* InterviewWritingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewWritingView.swift; sourceTree = "<group>"; };
 		3334AB6669AF77A7428AE1FB /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
+		33424619904AFC8B97256425 /* QuestionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QuestionsService.swift; path = Passcit/Domain/QuestionsService.swift; sourceTree = SOURCE_ROOT; };
+		340A4BF4B3F153BCCF817036 /* StudyPanelViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StudyPanelViewModel.swift; path = Passcit/UI/Learn/StudyPanelViewModel.swift; sourceTree = SOURCE_ROOT; };
 		34FA2B3F98F4BBF1E630621F /* PracticeModelDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeModelDecodingTests.swift; sourceTree = "<group>"; };
 		350B545182D0AB250EF1973C /* GoogleSignInController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInController.swift; sourceTree = "<group>"; };
 		3A09F9641A0F464740EC22BF /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
@@ -194,12 +220,15 @@
 		4519CBCF469D5856A363C1A7 /* AccountSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsView.swift; sourceTree = "<group>"; };
 		4A30D8AAAF677907D8739D49 /* TokenPair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPair.swift; sourceTree = "<group>"; };
 		4AF71D41068198018B0BE81B /* SpeechTranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechTranscriptionService.swift; sourceTree = "<group>"; };
+		4B794F13B60974FA0339C37A /* StudyLanguageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StudyLanguageStore.swift; path = Passcit/UI/Learn/StudyLanguageStore.swift; sourceTree = SOURCE_ROOT; };
 		4C16F89EFAD06B4D10B1F500 /* PracticeTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeTest.swift; sourceTree = "<group>"; };
+		4C82437F9F8BF7E71B1D7D26 /* MockStudySpeechSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MockStudySpeechSynthesizer.swift; path = PasscitTests/Learn/MockStudySpeechSynthesizer.swift; sourceTree = SOURCE_ROOT; };
 		50896A80FCC61077E3043951 /* RoadmapResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoadmapResponse.swift; sourceTree = "<group>"; };
 		514A14560971C947CBDE2933 /* PracticeFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeFixtures.swift; sourceTree = "<group>"; };
 		52F3D5CA0411CD274F3526A5 /* AudioSessionCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionCoordinatorTests.swift; sourceTree = "<group>"; };
 		53DD595430D0E8F21C8BED8E /* UnitExam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitExam.swift; sourceTree = "<group>"; };
 		54E86747F71853BC23BC1BBD /* InterviewSimulation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewSimulation.swift; sourceTree = "<group>"; };
+		571446F6A8DC727ECD0B24BB /* StudyStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StudyStatus.swift; path = Passcit/Models/StudyStatus.swift; sourceTree = SOURCE_ROOT; };
 		5C379EF1C9F73135168707E2 /* InterviewHistoryViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewHistoryViewModelTests.swift; sourceTree = "<group>"; };
 		5C74DDD0D99E561A43DF271E /* PasscitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasscitApp.swift; sourceTree = "<group>"; };
 		5D7AF7D4D7B4E47846B69B31 /* EligibilityFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityFormView.swift; sourceTree = "<group>"; };
@@ -210,7 +239,9 @@
 		61FDBC89488FD9003170B9E8 /* AccountSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsViewModel.swift; sourceTree = "<group>"; };
 		623C0844F2D1527F985089A6 /* PracticeQuestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeQuestionView.swift; sourceTree = "<group>"; };
 		63145804548FCD54EFDC3D17 /* PracticeResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeResultView.swift; sourceTree = "<group>"; };
+		66CE4EDD8CB3A491150970D3 /* Question.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Question.swift; path = Passcit/Models/Question.swift; sourceTree = SOURCE_ROOT; };
 		66CF47F22512CCE242B7B0F2 /* EligibilityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityViewModel.swift; sourceTree = "<group>"; };
+		679049B385496F745FDA06B0 /* FlashcardDeckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlashcardDeckView.swift; path = Passcit/UI/Practice/FlashcardDeckView.swift; sourceTree = SOURCE_ROOT; };
 		686A013D5F40BF25A938B2E3 /* PasscitTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PasscitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		68F9B27FC42673E5014FB89F /* ProfileUpdateRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileUpdateRequest.swift; sourceTree = "<group>"; };
 		699D2434734EB0EBB43ED678 /* Passcit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Passcit.entitlements; sourceTree = "<group>"; };
@@ -230,6 +261,7 @@
 		8B829CA01821501ED404A19B /* AuthState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthState.swift; sourceTree = "<group>"; };
 		8B977434AA453531F34CBCDF /* TokenRefreshCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRefreshCoordinator.swift; sourceTree = "<group>"; };
 		8CF695FC1D8683B004A43F87 /* DashboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardService.swift; sourceTree = "<group>"; };
+		8E174C7584F76C8B1D08C6AC /* LanguagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LanguagePickerView.swift; path = Passcit/UI/Learn/LanguagePickerView.swift; sourceTree = SOURCE_ROOT; };
 		8E9AE0780C30E75A2D1F2F91 /* LessonViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonViewModelTests.swift; sourceTree = "<group>"; };
 		8EB703E026F47190399B9F51 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		96F382782FD0A09881974C61 /* UnitRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitRowView.swift; sourceTree = "<group>"; };
@@ -239,14 +271,18 @@
 		A25583A2741E35D9505C6F00 /* ContentVersionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentVersionResponse.swift; sourceTree = "<group>"; };
 		A27587E9B53975C48D75DA27 /* PracticeAnswer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeAnswer.swift; sourceTree = "<group>"; };
 		A32F43DA5333698AB9490E46 /* InterviewCivicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewCivicsView.swift; sourceTree = "<group>"; };
+		A4F74C00BFE1E0E8209C6AC0 /* FlashcardDeckViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlashcardDeckViewModelTests.swift; path = PasscitTests/Practice/FlashcardDeckViewModelTests.swift; sourceTree = SOURCE_ROOT; };
 		A525C10EA5CB3F7EB633A422 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
 		A55A32B6F3C388FE03B31451 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		A5A44DBCB225A0DC19543F73 /* MockStudyContentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MockStudyContentService.swift; path = PasscitTests/Learn/MockStudyContentService.swift; sourceTree = SOURCE_ROOT; };
 		A6BD06F104A793B2190B7BB3 /* GoogleOAuthConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleOAuthConfig.swift; sourceTree = "<group>"; };
 		A6D1A74E3412668DA25BA88C /* InterviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewViewModel.swift; sourceTree = "<group>"; };
 		A7C3D8B00DD486DDF8BC3CA0 /* InterviewDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewDetailViewModel.swift; sourceTree = "<group>"; };
 		A9E37C04EF40ED7C34AC0A0E /* EligibilityFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityFixtures.swift; sourceTree = "<group>"; };
 		AC0F28FD5D02E3E778BD3844 /* LearnModelDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnModelDecodingTests.swift; sourceTree = "<group>"; };
+		AD2243DD9D1D9ECD447B53F6 /* StudyLanguageStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StudyLanguageStoreTests.swift; path = PasscitTests/Learn/StudyLanguageStoreTests.swift; sourceTree = SOURCE_ROOT; };
 		B0952972B79117D05FC4EB40 /* LessonViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonViewModel.swift; sourceTree = "<group>"; };
+		B0DF469EAAC5BDF4FAC4C166 /* TypedAnswerField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TypedAnswerField.swift; path = Passcit/UI/Interview/TypedAnswerField.swift; sourceTree = SOURCE_ROOT; };
 		B54D893EAE457F4AEF42B762 /* EligibilityResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityResultView.swift; sourceTree = "<group>"; };
 		B68460D30B015BED866BFBF0 /* APIClientError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClientError.swift; sourceTree = "<group>"; };
 		B89B777636ED7302025DA746 /* AppleCredential.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleCredential.swift; sourceTree = "<group>"; };
@@ -262,6 +298,7 @@
 		CBDB9D4DA9CE43FD6583288E /* SpeechSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSynthesizer.swift; sourceTree = "<group>"; };
 		CD4DE751946C74EAAAB2E1A3 /* AccountSettingsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsViewModelTests.swift; sourceTree = "<group>"; };
 		CDBA6030CD40470EF224F2ED /* AuthSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSheetView.swift; sourceTree = "<group>"; };
+		D04C4166809F5EC22305787E /* StudyPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StudyPanelView.swift; path = Passcit/UI/Learn/StudyPanelView.swift; sourceTree = SOURCE_ROOT; };
 		D148187C7326680D848E1594 /* PracticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeView.swift; sourceTree = "<group>"; };
 		D267E50AB2A2B0FC2520ABAF /* FirstLaunchFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchFlowView.swift; sourceTree = "<group>"; };
 		D31921F3BC9915A7D8DD6704 /* AccountSettingsFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsFixtures.swift; sourceTree = "<group>"; };
@@ -271,10 +308,12 @@
 		D724BD4E17B15ED0D1636CD5 /* MockAudioInfrastructure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAudioInfrastructure.swift; sourceTree = "<group>"; };
 		D8A01E9DA5736A0EC48CE615 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		D93D4E29AC1891F1C289C9B3 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		DC2349BC937309EF7CC889D2 /* QuestionFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QuestionFixtures.swift; path = PasscitTests/Practice/QuestionFixtures.swift; sourceTree = SOURCE_ROOT; };
 		DE8988D6DACF5238DBEDC3E8 /* PracticeMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeMode.swift; sourceTree = "<group>"; };
 		E145A6FDF9A26468B23997F8 /* MockLearnService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockLearnService.swift; sourceTree = "<group>"; };
 		E16C2ED13B4C3A04C034EF29 /* EligibilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityService.swift; sourceTree = "<group>"; };
 		E22499EEC232F5D9E4DB2939 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
+		E2304158B4AD4CD1C4E7A449 /* MockQuestionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MockQuestionsService.swift; path = PasscitTests/Practice/MockQuestionsService.swift; sourceTree = SOURCE_ROOT; };
 		E3C7308BBA12F1B97ADD1874 /* SpeechVoiceSelectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechVoiceSelectorTests.swift; sourceTree = "<group>"; };
 		E4DAECD85ACB732EC9044B19 /* PracticeTestResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeTestResult.swift; sourceTree = "<group>"; };
 		E5AB09F4A4B31B746D86CF29 /* InterviewHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewHistory.swift; sourceTree = "<group>"; };
@@ -283,6 +322,8 @@
 		EAEE8B3DF6D85E04435316BB /* InterviewAnswerInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewAnswerInputView.swift; sourceTree = "<group>"; };
 		EF52770AE566B401918ACFB8 /* ModelDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDecodingTests.swift; sourceTree = "<group>"; };
 		EF8604FB7E4C21C0295C175B /* QuestionCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionCategory.swift; sourceTree = "<group>"; };
+		EFAA468186EE98D9E8099D84 /* QuestionDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QuestionDetail.swift; path = Passcit/Models/QuestionDetail.swift; sourceTree = SOURCE_ROOT; };
+		F1054F9BB8F9B351D6078DD4 /* FlashcardDeckViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlashcardDeckViewModel.swift; path = Passcit/UI/Practice/FlashcardDeckViewModel.swift; sourceTree = SOURCE_ROOT; };
 		F1357247519D006E57C160D0 /* ErrorStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorStateView.swift; sourceTree = "<group>"; };
 		F1F3D97F1D54CDAA1732E493 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		F30750508196CD566373C28D /* RoadmapTeaserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoadmapTeaserView.swift; sourceTree = "<group>"; };
@@ -293,6 +334,7 @@
 		F6D22042323D6E8E8B6697A3 /* InterviewHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewHistoryViewModel.swift; sourceTree = "<group>"; };
 		F84D568B2132578A53A55F15 /* LearnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnView.swift; sourceTree = "<group>"; };
 		FA42BB0D54CF35747EDA7C93 /* PracticeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeService.swift; sourceTree = "<group>"; };
+		FB5D4CD585C7A545D7CD1A10 /* StudyContentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StudyContentService.swift; path = Passcit/Domain/StudyContentService.swift; sourceTree = SOURCE_ROOT; };
 		FDF8D3AFF41E6CB096CBECC2 /* EligibilityRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityRequest.swift; sourceTree = "<group>"; };
 		FE95CC16373CFC17F0615A0D /* KeychainStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStoreTests.swift; sourceTree = "<group>"; };
 		FFFC0897654FCFEF1243B339 /* DashboardResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardResponse.swift; sourceTree = "<group>"; };
@@ -316,6 +358,9 @@
 				D44490D89CF6AAA9EF30C777 /* MockPracticeService.swift */,
 				514A14560971C947CBDE2933 /* PracticeFixtures.swift */,
 				1AB9FB6DD05F831AD9AFB065 /* PracticeViewModelTests.swift */,
+				E2304158B4AD4CD1C4E7A449 /* MockQuestionsService.swift */,
+				DC2349BC937309EF7CC889D2 /* QuestionFixtures.swift */,
+				A4F74C00BFE1E0E8209C6AC0 /* FlashcardDeckViewModelTests.swift */,
 			);
 			path = Practice;
 			sourceTree = "<group>";
@@ -385,6 +430,10 @@
 				1875C620543B39EC29A0DE52 /* UnitExamView.swift */,
 				45113DB12E3554041F075127 /* UnitExamViewModel.swift */,
 				96F382782FD0A09881974C61 /* UnitRowView.swift */,
+				4B794F13B60974FA0339C37A /* StudyLanguageStore.swift */,
+				8E174C7584F76C8B1D08C6AC /* LanguagePickerView.swift */,
+				340A4BF4B3F153BCCF817036 /* StudyPanelViewModel.swift */,
+				D04C4166809F5EC22305787E /* StudyPanelView.swift */,
 			);
 			path = Learn;
 			sourceTree = "<group>";
@@ -422,6 +471,10 @@
 				8E9AE0780C30E75A2D1F2F91 /* LessonViewModelTests.swift */,
 				E145A6FDF9A26468B23997F8 /* MockLearnService.swift */,
 				6CC376BBC4D8313D124C28A3 /* UnitExamViewModelTests.swift */,
+				A5A44DBCB225A0DC19543F73 /* MockStudyContentService.swift */,
+				4C82437F9F8BF7E71B1D7D26 /* MockStudySpeechSynthesizer.swift */,
+				094042158FE1C947EB033499 /* StudyPanelViewModelTests.swift */,
+				AD2243DD9D1D9ECD447B53F6 /* StudyLanguageStoreTests.swift */,
 			);
 			path = Learn;
 			sourceTree = "<group>";
@@ -558,6 +611,8 @@
 				FA42BB0D54CF35747EDA7C93 /* PracticeService.swift */,
 				CBDB9D4DA9CE43FD6583288E /* SpeechSynthesizer.swift */,
 				4AF71D41068198018B0BE81B /* SpeechTranscriptionService.swift */,
+				33424619904AFC8B97256425 /* QuestionsService.swift */,
+				FB5D4CD585C7A545D7CD1A10 /* StudyContentService.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -593,6 +648,11 @@
 				53DD595430D0E8F21C8BED8E /* UnitExam.swift */,
 				BFB1A1DAEA73901B5ED9E537 /* User.swift */,
 				C274A8F6564ABC27DD4AF56D /* UserMeResponse.swift */,
+				66CE4EDD8CB3A491150970D3 /* Question.swift */,
+				EFAA468186EE98D9E8099D84 /* QuestionDetail.swift */,
+				571446F6A8DC727ECD0B24BB /* StudyStatus.swift */,
+				1F91467898F253345FBB5119 /* StudyLanguage.swift */,
+				044C493E822F8AF36C78DE0F /* StudyContent.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -612,6 +672,7 @@
 				9EE466669BF457225C10551B /* InterviewView.swift */,
 				A6D1A74E3412668DA25BA88C /* InterviewViewModel.swift */,
 				30DD557676E094672F66D32C /* InterviewWritingView.swift */,
+				B0DF469EAAC5BDF4FAC4C166 /* TypedAnswerField.swift */,
 			);
 			path = Interview;
 			sourceTree = "<group>";
@@ -648,6 +709,8 @@
 				63145804548FCD54EFDC3D17 /* PracticeResultView.swift */,
 				D148187C7326680D848E1594 /* PracticeView.swift */,
 				BDD7737FD17C1AF0AB5F9ABA /* PracticeViewModel.swift */,
+				679049B385496F745FDA06B0 /* FlashcardDeckView.swift */,
+				F1054F9BB8F9B351D6078DD4 /* FlashcardDeckViewModel.swift */,
 			);
 			path = Practice;
 			sourceTree = "<group>";
@@ -864,6 +927,20 @@
 				926F255BE670C309F664AC6A /* User.swift in Sources */,
 				D7089A79BD158EC32245BA20 /* UserMeResponse.swift in Sources */,
 				029402719F35AFD7EF9E564F /* WelcomeView.swift in Sources */,
+				B2D149608B806A69368693B6 /* Question.swift in Sources */,
+				54EB45F5B657B12E56EFA71A /* QuestionDetail.swift in Sources */,
+				F65A4C7B947D852ED3350587 /* StudyStatus.swift in Sources */,
+				7D844C079B386FB0503F593D /* QuestionsService.swift in Sources */,
+				52FC4A6BA6621714FF769492 /* FlashcardDeckView.swift in Sources */,
+				74344D68BD884C70039CE276 /* FlashcardDeckViewModel.swift in Sources */,
+				9B924B828C995B51F48246D0 /* TypedAnswerField.swift in Sources */,
+				15234163A8B8C7B4C2933CB6 /* StudyLanguage.swift in Sources */,
+				A8AF4EA194462FDDBC681E69 /* StudyContent.swift in Sources */,
+				417F491490C83CF6993FDC54 /* StudyContentService.swift in Sources */,
+				98DF4F5592CE490058776237 /* StudyLanguageStore.swift in Sources */,
+				10C943959FFCEBF801B4210B /* LanguagePickerView.swift in Sources */,
+				2B7347C9A1D3826EC0B5758F /* StudyPanelViewModel.swift in Sources */,
+				DA4145EEACD14A9E0F9B0ADE /* StudyPanelView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -903,6 +980,13 @@
 				A7B5C4774B710A93983E93BF /* SessionStoreTests.swift in Sources */,
 				B5BB7EA11E1593BA13EE79DB /* SpeechVoiceSelectorTests.swift in Sources */,
 				9C85C8C0BB3F96D63CCB4923 /* UnitExamViewModelTests.swift in Sources */,
+				AAFA40A882965D4BAB17399E /* MockQuestionsService.swift in Sources */,
+				B5914E05B7A46BA83BFDC2A2 /* QuestionFixtures.swift in Sources */,
+				B7EE4FE6BE26003D08B7CD4E /* FlashcardDeckViewModelTests.swift in Sources */,
+				CE19427699A7587381774D7F /* MockStudyContentService.swift in Sources */,
+				EF254CABA49F2D399FB7D533 /* MockStudySpeechSynthesizer.swift in Sources */,
+				BDB841B48499C1AA857125D5 /* StudyPanelViewModelTests.swift in Sources */,
+				279A4B0F897941A121F0E6B9 /* StudyLanguageStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,6 +9,16 @@ protocol SpeechSynthesizing: AnyObject {
     func stopSpeaking()
 }
 
+/// Multi-language variant used by the Learn tab's Study Panel "Listen"
+/// button — unlike Interview's fixed en-US voice (chosen once at init),
+/// the study language can change at any time via the language picker, so
+/// the voice is resolved fresh on every call from a BCP-47 tag (see
+/// StudyLanguage.speechTag).
+protocol StudySpeechSynthesizing: AnyObject {
+    func speak(_ text: String, languageCode: String) async
+    func stopSpeaking()
+}
+
 /// The properties this module actually needs from a system voice —
 /// lets voice *selection* be tested with lightweight mocks instead of
 /// real AVSpeechSynthesisVoice instances, whose quality tier can't be
@@ -43,7 +53,7 @@ enum SpeechVoiceSelector {
     }
 }
 
-final class SpeechSynthesizer: NSObject, SpeechSynthesizing {
+final class SpeechSynthesizer: NSObject, SpeechSynthesizing, StudySpeechSynthesizing {
     // AVSpeechSynthesizer isn't Sendable, but this class only ever touches
     // it from the main actor in practice (speak/stopSpeaking are called
     // from a @MainActor ViewModel, and the delegate callbacks below run on
@@ -72,6 +82,21 @@ final class SpeechSynthesizer: NSObject, SpeechSynthesizing {
     }
 
     func speak(_ text: String) async {
+        await speakUtterance(text, voice: voice)
+    }
+
+    // StudySpeechSynthesizing conformance — resolves a voice fresh on
+    // every call (the study language can change between calls, unlike
+    // Interview's fixed `voice` picked once at init), falling back to
+    // whatever system default AVSpeechSynthesisVoice offers for the
+    // language exactly like preferredVoice() does for en-US.
+    func speak(_ text: String, languageCode: String) async {
+        let voice = SpeechVoiceSelector.selectBest(from: AVSpeechSynthesisVoice.speechVoices(), language: languageCode)
+            ?? AVSpeechSynthesisVoice(language: languageCode)
+        await speakUtterance(text, voice: voice)
+    }
+
+    private func speakUtterance(_ text: String, voice: AVSpeechSynthesisVoice?) async {
         stopSpeaking()
         await withCheckedContinuation { continuation in
             self.continuation = continuation

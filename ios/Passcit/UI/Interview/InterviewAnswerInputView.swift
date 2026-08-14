@@ -20,6 +20,7 @@ struct InterviewAnswerInputView: View {
         VStack(alignment: .leading, spacing: 16) {
             if allowsRecording {
                 recordingControl
+                    .disabled(isSubmitting)
                 if isRecording {
                     Text(liveTranscript.isEmpty ? "Listening…" : liveTranscript)
                         .font(.body)
@@ -38,20 +39,17 @@ struct InterviewAnswerInputView: View {
                     .foregroundStyle(.secondary)
             }
 
-            HStack(alignment: .bottom) {
-                TextField("Type your answer", text: $typedAnswer, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .accessibilityLabel("Typed answer")
-                Button("Submit") {
+            TypedAnswerField(
+                placeholder: "Type your answer",
+                text: $typedAnswer,
+                isSubmitting: isSubmitting,
+                onSubmit: {
                     let answer = typedAnswer
                     typedAnswer = ""
                     onSubmitTyped(answer)
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(typedAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSubmitting)
-            }
+            )
         }
-        .disabled(isSubmitting)
     }
 
     @ViewBuilder

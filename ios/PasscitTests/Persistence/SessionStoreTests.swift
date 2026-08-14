@@ -43,14 +43,14 @@ final class SessionStoreTests {
     }
 
     @Test func saveAndReadCachedUser() {
-        let user = User(id: "u_1", name: "Jane", email: "jane@example.com", image: nil, role: .user)
+        let user = User(id: "u_1", name: "Jane", email: "jane@example.com", image: nil, role: .user, studyLanguage: nil)
         store.saveUser(user)
         #expect(store.cachedUser == user)
     }
 
     @Test func clearRemovesEverything() {
         store.saveTokens(TokenPair(accessToken: "at1", refreshToken: "rt1", expiresIn: 900, tokenType: "Bearer"))
-        store.saveUser(User(id: "u_1", name: "Jane", email: "jane@example.com", image: nil, role: .user))
+        store.saveUser(User(id: "u_1", name: "Jane", email: "jane@example.com", image: nil, role: .user, studyLanguage: nil))
 
         store.clear()
 
