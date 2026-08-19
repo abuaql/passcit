@@ -41,6 +41,11 @@ export const AUTH_RATE_LIMITS = {
   nativeApple: { windowMs: 15 * 60 * 1000, max: 10 },
   nativeGoogle: { windowMs: 15 * 60 * 1000, max: 10 },
   forgotPassword: { windowMs: 60 * 60 * 1000, max: 5 },
+  // Public support form (/api/support). Not an auth endpoint, but it
+  // sends email on an unauthenticated request, which is exactly the
+  // shape that needs a ceiling — kept here so every limit in the app
+  // is still declared in one place.
+  supportMessage: { windowMs: 60 * 60 * 1000, max: 5 },
 } as const satisfies Record<string, RateLimitConfig>;
 
 interface WindowState {

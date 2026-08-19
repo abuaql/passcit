@@ -53,6 +53,8 @@ export const strings = {
     disclaimer:
       "Passcit is an independent study tool and is not affiliated with, endorsed by, or sponsored by USCIS or the U.S. Department of Homeland Security.",
     copyright: (year: number) => `© ${year} Passcit. All rights reserved.`,
+    privacy: "Privacy Policy",
+    support: "Support",
   },
   pwa: {
     installTitle: "Install Passcit",

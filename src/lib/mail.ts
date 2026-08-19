@@ -63,3 +63,76 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
     html,
   });
 }
+
+/**
+ * Delivers a message from the public support form to the Passcit support
+ * inbox. Returns false when SMTP isn't configured, so the route can tell
+ * the sender the truth rather than showing a success screen for a
+ * message that was never sent.
+ *
+ * `replyTo` is the visitor's address: the support inbox can reply
+ * straight from the email client, and the `from` stays the app's own
+ * configured sender so the message isn't rejected as a forgery.
+ */
+export async function sendSupportMessage(params: {
+  to: string;
+  fromEmail: string;
+  category: string;
+  message: string;
+  deviceInfo?: string;
+  appVersion?: string;
+}): Promise<boolean> {
+  if (!transporter) {
+    logger.error(
+      "mail.sendSupportMessage",
+      "SMTP is not configured — a support message could not be delivered. Set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD."
+    );
+    return false;
+  }
+
+  const rows: Array<[string, string]> = [
+    ["From", params.fromEmail],
+    ["Category", params.category],
+    ...(params.deviceInfo ? ([["Device", params.deviceInfo]] as Array<[string, string]>) : []),
+    ...(params.appVersion ? ([["App version", params.appVersion]] as Array<[string, string]>) : []),
+  ];
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 640px; color: #1A1D23;">
+      <h2 style="margin-bottom: 12px;">Passcit support request</h2>
+      <table style="border-collapse: collapse; font-size: 14px; margin-bottom: 16px;">
+        ${rows
+          .map(
+            ([label, value]) =>
+              `<tr><td style="padding:2px 12px 2px 0; color:#6B7280;">${label}</td><td style="padding:2px 0;">${escapeHtml(value)}</td></tr>`
+          )
+          .join("")}
+      </table>
+      <div style="white-space: pre-wrap; line-height: 1.5;">${escapeHtml(params.message)}</div>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM ?? "Passcit <no-reply@passcit.local>",
+    to: params.to,
+    replyTo: params.fromEmail,
+    subject: `Passcit support — ${params.category}`,
+    html,
+  });
+
+  return true;
+}
+
+/**
+ * Visitor-supplied text goes into an HTML email body, so it is escaped
+ * here rather than trusted — the same reason any user input is escaped
+ * before it lands in markup.
+ */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
